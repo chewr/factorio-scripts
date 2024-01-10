@@ -1,5 +1,5 @@
 config:
-  units: per-minute
+  units: minute
   modules:
     productivity: productivity-module-3
 bus-inputs:
@@ -240,7 +240,7 @@ base-outputs:
   personal-laser-defense-equipment: 0.001,
   se-core-miner: 0.05,
   se-pulveriser: 1,
-special-items:
+peak-outputs:
   steam-turbine: 3,
   heat-pipe: 25,
   nuclear-fuel: 5,
