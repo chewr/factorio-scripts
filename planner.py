@@ -52,6 +52,8 @@ class ProductionPlanner:
             for item in items_requested.keys():
                 unmet_demand[item] -= recipe.get_yield(item, productivity)
 
+            self._unmet_demand = unmet_demand
+
             # Update statistics
             self.recipe_rates[recipe] = recipes_per_second
             self.productivity_by_recipe[recipe] = productivity
