@@ -52,6 +52,8 @@ class BaseItem(Resource):
             bases.append(FacilityItem)
         if item.technology is not None:
             bases.append(TechnologyItem)
+        if item.module is not None:
+            bases.append(ModuleItem)
 
         bases.reverse()
 
@@ -88,6 +90,19 @@ class FuelItem:
         self.fuel_result = fuel.result
 
 
+class ModuleItem:
+    def __init__(self, item: fl.Item):
+        super().__init__(item)
+        module = item.module
+        self.consumption = module.consumption
+        self.pollution = module.pollution
+        self.productivity = (
+            module.productivity if hasattr(module, "productivity") else None
+        )
+        self.speed = module.speed if hasattr(module, "speed") else None
+        self.limitation = module.limitation if hasattr(module, "limitation") else None
+
+
 class FacilityItem:
     def __init__(self, item: fl.Item):
         super().__init__(item)
@@ -97,7 +112,7 @@ class FacilityItem:
             not machine.disallowedEffects
             or "productivity" not in machine.disallowedEffects
         )
-        self.modules = item.modules or 0
+        self.modules = item.modules if hasattr(item, "modules") else 0
 
         space_machine_ids = {
             "se-space-probe-rocket-silo",
