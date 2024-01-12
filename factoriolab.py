@@ -232,14 +232,6 @@ class Recipe:
 
 
 @dataclass
-class Limitations:
-    productivity_module: List[str]
-
-    def __init__(self, data):
-        self.productivity_module = data.get("productivity-module")
-
-
-@dataclass
 class Defaults:
     beacon: str
     minBelt: str
@@ -274,7 +266,7 @@ class Data:
     icons: List[Icon]
     items: List[Item]
     recipes: List[Recipe]
-    limitations: Limitations
+    limitations: Dict[str, str]
     defaults: Defaults
 
     def __init__(self, data):
@@ -283,7 +275,7 @@ class Data:
         self.icons = [Icon(e) for e in data.get("icons")]
         self.items = [Item(e) for e in data.get("items")]
         self.recipes = [Recipe(e) for e in data.get("recipes")]
-        self.limitations = Limitations(data.get("limitations"))
+        self.limitations = data.get("limitations")
         self.defaults = Defaults(data.get("defaults"))
 
 
@@ -301,7 +293,6 @@ __all__ = [
     "Technology",
     "Item",
     "Recipe",
-    "Limitations",
     "Defaults",
     "Data",
     "load_factoriolab_data",

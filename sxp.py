@@ -330,6 +330,13 @@ class Factory:
             recipe.link_items(self.items)
             recipe.link_facilities(self.facilities)
 
+        self.limitations = {
+            category: {self.recipes[rid] for rid in recipe_ids}
+            for category, recipe_ids in data.limitations
+        }
+
+        self._data = data
+
     @classmethod
     def from_file(cls, fp):
         fl_data = fl.load_factoriolab_data(fp)
