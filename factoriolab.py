@@ -1,6 +1,12 @@
 from dataclasses import dataclass
 from typing import Dict, List, Optional
 
+"""
+from factoriolab import load_factoriolab_data
+
+data = load_factoriolab_data("../factorio/sxp.json")
+"""
+
 
 def load_factoriolab_data(filepath):
     with open(filepath, "r") as f:

@@ -1,5 +1,15 @@
 import yaml
 
+"""
+from config import Config, load_parameters
+from sxp import Factory
+
+factory = Factory.from_file("../factorio/sxp.json")
+
+params = load_parameters("./parameters.yml")
+cfg = Config.of(params, factory)
+"""
+
 
 def load_parameters(fp):
     with open(fp, "r") as f:

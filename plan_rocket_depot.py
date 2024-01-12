@@ -1,6 +1,11 @@
 from config import Config, load_parameters
 from sxp import Factory
 
+"""
+Usage:
+plan_rocket_depot.py ../factorio/sxp.json
+"""
+
 
 def calculate_production(
     factory, bus_inputs, desired_outputs, productivity_module=None

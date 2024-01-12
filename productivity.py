@@ -1,5 +1,14 @@
 import math
 
+"""
+from productivity import ProductivityPlanner
+from terrestrial import TerrestrialPartition
+
+tp = TerrestrialPartition(factory)
+
+pp = ProductivityPlanner(factory.limitations, tp.recipes_to_machines, cfg.modules.get("productivity"))
+"""
+
 
 class ProductivityPlanner:
     def __init__(self, limitations, recipes_to_machines, productivity_module):
