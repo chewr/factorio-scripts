@@ -8,7 +8,10 @@ def load_parameters(fp):
 
 class Config:
     def __init__(self, bus_inputs, base_outputs, peak_outputs, modules=None):
-        self.bus_
+        self.bus_inputs = bus_inputs
+        self.base_outputs = base_outputs
+        self.peak_outputs = peak_outputs
+        self.modules = modules
 
     @classmethod
     def of(cls, data, factory):
@@ -30,5 +33,8 @@ class Config:
                 factory.items[itid]: q / unit_seconds
                 for itid, q in data["peak-outputs"].items()
             },
-            modules=data["config"].get("modules"),
+            modules={
+                module_type: factory.items[itid]
+                for module_type, itid in data["config"].get("modules", {})
+            },
         )
