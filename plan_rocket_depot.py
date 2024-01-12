@@ -3,7 +3,7 @@ from sxp import Factory
 
 """
 Usage:
-plan_rocket_depot.py ../factorio/sxp.json
+python3 plan_rocket_depot.py ../factorio/sxp.json
 """
 
 
@@ -24,6 +24,7 @@ def main(factory_data_file, *args):
     factory = Factory.from_file(factory_data_file)
     parameters = load_parameters("parameters.yml")
     conf = Config(parameters, factory)
+
     # TODO: we need a lookup for preferred recipes
     production = calculate_production(
         factory,

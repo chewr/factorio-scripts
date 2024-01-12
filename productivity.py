@@ -38,5 +38,7 @@ class ProductivityPlanner:
                 for item, required in required_output.items()
             ]
         )
+
+        recipes_per_second = actual_parallelism / recipe.time
         machines_required = math.ceil(actual_parallelism / speed)
-        return machine, machines_required, actual_parallelism, productivity
+        return machine, machines_required, recipes_per_second, productivity
