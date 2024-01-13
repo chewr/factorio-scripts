@@ -22,8 +22,27 @@ def calculate_production(factory, conf):
         terrestrial_partition.recipes_to_machines,
         conf.get_productivity_module(),
     )
-    return ProductionPlanner(
+    plan = ProductionPlanner(
         conf.bus_inputs, conf.base_outputs, terrestrial_partition, module_manager
+    )
+
+    print("Unmet demands:")
+    print(
+        [
+            k
+            for k in plan._unmet_demand
+            if terrestrial_partition.items_to_recipes[k] not in plan.recipe_rates
+        ]
+    )
+
+    print("Partially met demands:")
+    print(
+        {
+            k: v
+            for k, v in plan._unmet_demand.items()
+            if terrestrial_partition.items_to_recipes[k] in plan.recipe_rates
+            and v > 1e-10
+        }
     )
 
 
