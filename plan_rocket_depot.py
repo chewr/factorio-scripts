@@ -32,6 +32,18 @@ def calculate_production(factory, conf):
     )
 
 
+def create_sushi_layout(base_inputs, desired_outputs, production_plan, layout_file=None, interactive=True):
+    """
+    TODO:
+    - Create a layout planner class
+      - 
+    - Create a few decier adapters:
+      - Interactive input, which prompts on the command line for decisions
+      - file input which reads a file for answers to decision prompts
+      - automated decider which follows some heuristic to make decisions
+    """
+    pass
+
 def main(factory_data_file, *args):
     factory = Factory.from_file(factory_data_file)
     parameters = load_parameters("parameters.yml")
