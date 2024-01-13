@@ -1,15 +1,24 @@
-from functool import cmp_to_key
-
-
-def compare_recipes(r1, r2):
-    """
-    r1 < r2 if r1 must be done before r2
-    """
-    if r1.outputs.keys() & r2.ingredients.keys():
-        return -1
-    if r1.ingredients.keys() & r2.outputs.keys():
-        return 1
-    return 0
+def linearize_recipes(available_recipes, base_ingredients, reverse=False):
+    linearized_recipes = []
+    available_ingredients = base_ingredients.copy()
+    q = [r for r in available_recipes if r.ingredients.keys() <= available_ingredients]
+    while q:
+        cur = q.pop()
+        linearized_recipes.append(cur)
+        available_ingredients.update(cur.outputs.keys())
+        for output in cur.outputs:
+            for usage in output.usages.keys() & available_recipes:
+                if usage.ingredients.keys() <= available_ingredients:
+                    # We are guaranteed to see each producible recipe I times where
+                    # I is the number of ingredients in that recipe, as we will
+                    # reach it by traversing the edge from each ingredient. We are
+                    # guaranteed that exactly once (on the final visit) all
+                    # ingredients will be in available_ingredients and we can add it to
+                    # our toposort
+                    q.append(usage)
+    if reverse:
+        linearized_recipes.reverse()
+    return linearized_recipes
 
 
 class ProductionPlanner:
@@ -37,11 +46,12 @@ class ProductionPlanner:
                     continue
                 q.append(self._constraints.items_to_recipes[ingredient])
 
-        # Collect production statistics
-        linearized_recipes = sorted(
-            recipes, key=cmp_to_key(compare_recipes), reverse=True
+        # Topologically sort recipes
+        linearized_recipes = linearize_recipes(
+            recipes, set(self._input.keys()), reverse=True
         )
-        unmet_demand = self._outputs.copy()
+
+        unmet_demand = self._output.copy()
         self.recipe_rates = {}
         self.productivity_by_recipe = {}
         self.machine_requirements = {}
@@ -59,10 +69,10 @@ class ProductionPlanner:
             ) = self._machines.get_machine_requirements(recipe, items_requested)
 
             # Update unmet_demand
-            for ingredient, quantity in recipe.ingredients:
-                if ingredient in self._inputs:
+            for ingredient, quantity in recipe.ingredients.items():
+                if ingredient in self._input:
                     continue
-                unmet_demand[ingredient] += (
+                unmet_demand[ingredient] = (
                     unmet_demand.get(ingredient, 0) + quantity * recipes_per_second
                 )
             for item in items_requested.keys():

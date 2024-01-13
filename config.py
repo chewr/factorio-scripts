@@ -13,7 +13,7 @@ cfg = Config.of(params, factory)
 
 def load_parameters(fp):
     with open(fp, "r") as f:
-        return Config.of(yaml.safe_load(f))
+        return yaml.safe_load(f)
 
 
 class Config:
@@ -37,19 +37,19 @@ class Config:
         }[time_unit]
         return cls(
             bus_inputs={
-                factory.items[itid]: q / unit_seconds
+                factory.items[itid]: float(q) / unit_seconds
                 for itid, q in data["bus-inputs"].items()
             },
             base_outputs={
-                factory.items[itid]: q / unit_seconds
+                factory.items[itid]: float(q) / unit_seconds
                 for itid, q in data["base-outputs"].items()
             },
             peak_outputs={
-                factory.items[itid]: q / unit_seconds
+                factory.items[itid]: float(q) / unit_seconds
                 for itid, q in data["peak-outputs"].items()
             },
             modules={
                 module_type: factory.items[itid]
-                for module_type, itid in data["config"].get("modules", {})
+                for module_type, itid in data["config"].get("modules", {}).items()
             },
         )

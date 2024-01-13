@@ -332,7 +332,7 @@ class Factory:
 
         self.limitations = {
             category: {self.recipes[rid] for rid in recipe_ids}
-            for category, recipe_ids in data.limitations
+            for category, recipe_ids in data.limitations.items()
         }
 
         self._data = data

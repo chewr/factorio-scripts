@@ -20,17 +20,17 @@ def calculate_production(factory, conf):
     module_manager = ProductivityPlanner(
         factory.limitations,
         terrestrial_partition.recipes_to_machines,
-        conf.modules.get_productivity_module(),
+        conf.get_productivity_module(),
     )
     return ProductionPlanner(
-        conf.bus_inputs, conf.bus_outputs, terrestrial_partition, module_manager
+        conf.bus_inputs, conf.base_outputs, terrestrial_partition, module_manager
     )
 
 
 def main(factory_data_file, *args):
     factory = Factory.from_file(factory_data_file)
     parameters = load_parameters("parameters.yml")
-    conf = Config(parameters, factory)
+    conf = Config.of(parameters, factory)
 
     plan = calculate_production(factory, conf)
 

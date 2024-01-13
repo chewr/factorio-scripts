@@ -1,5 +1,4 @@
 from opinions import OpinionatedPartition
-
 from sxp import FacilityItem, MiningRecipe
 
 """
@@ -31,12 +30,16 @@ def find_terrestrial(factory):
             for recipe in output.usages.keys():
                 if not recipe.ingredients.keys() <= terrestrial_items:
                     # We haven't encountered all the ingredients yet
-                    # If this is a terrestrial recipe we will eventually see it again
-                    # at a point when we have encountered all ingredients
+                    # If this is a fully terrestrial recipe we will
+                    # eventually see it again at a point when we have
+                    # encountered all ingredients
                     continue
                 if all([p.is_space_only for p in recipe.producers]):
                     # This recipe can only be produced in space
                     continue
+                # Any recipes at this point can be produced terrestrially
+                # from terrestrial ingredients
+                terrestrial_recipes.add(recipe)
                 q.add(recipe)
     return terrestrial_recipes, terrestrial_items
 
