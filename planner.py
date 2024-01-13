@@ -80,7 +80,9 @@ class ProductionPlanner:
                     unmet_demand.get(ingredient, 0) + quantity * recipes_per_second
                 )
             for item in items_requested.keys():
-                unmet_demand[item] -= recipe.get_yield(item, productivity)
+                unmet_demand[item] -= (
+                    recipe.get_yield(item, productivity) * recipes_per_second
+                )
 
             # Update statistics
             self.recipe_rates[recipe] = recipes_per_second

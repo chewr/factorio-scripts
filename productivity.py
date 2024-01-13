@@ -23,13 +23,15 @@ class ProductivityPlanner:
                     1.0 + self._productivity_module.productivity * modules, 0.2
                 )  # TODO calculate beacon effects before applying the speed penalty cap
 
-        actual_parallelism = max(
+        recipes_per_second = max(
             [
-                required / (recipe.get_yield(item, productivity) / recipe.time)
+                required / recipe.get_yield(item, productivity)
                 for item, required in required_output.items()
             ]
         )
 
-        recipes_per_second = actual_parallelism / recipe.time
+        actual_parallelism = recipes_per_second * recipe.time
+
         machines_required = math.ceil(actual_parallelism / speed)
+
         return machine, machines_required, recipes_per_second, productivity

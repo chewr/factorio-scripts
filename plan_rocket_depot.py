@@ -48,6 +48,14 @@ def calculate_production(factory, conf):
             if partition.items_to_recipes[k] in plan.recipe_rates and v > 1e-10
         }
     )
+    print("Surplus production")
+    print(
+        {
+            k: v
+            for k, v in plan._unmet_demand.items()
+            if partition.items_to_recipes[k] in plan.recipe_rates and v < -1e-10
+        }
+    )
 
 
 def main(factory_data_file, *args):
