@@ -1,5 +1,9 @@
-class OpinionatedPartition:
-    def __init__(self):
+from partition import Partition
+
+
+class OpinionatedPartition(Partition):
+    def __init__(self, base_ingredients):
+        super().__init__(base_ingredients)
         # Opinion: Maximize productivity, then minimize # of machines
         self.recipes_to_machines = {
             r: max(
@@ -12,13 +16,15 @@ class OpinionatedPartition:
         # Opinion: Prefer simple recipes, then fast ones
         preferred_recipes = {}
         for item in self.items:
+            if item in base_ingredients:
+                continue
             available_recipes = item.recipes.keys() & self.recipes
             scored_recipes = []
             for recipe in available_recipes:
                 score = 0
-                score -= 10 * len(recipe.outputs)
+                score -= 100 * len(recipe.outputs)
                 score -= len(recipe.ingredients)
-                score += recipe.get_yield(item)
+                score += recipe.get_yield(item) / recipe.time
                 scored_recipes.append((score, recipe))
             preferred_recipes[item] = max(scored_recipes)[1]
 

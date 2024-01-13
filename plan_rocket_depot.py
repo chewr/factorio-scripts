@@ -1,13 +1,18 @@
 from config import Config, load_parameters
+from opinions import OpinionatedPartition
 from planner import ProductionPlanner
 from productivity import ProductivityPlanner  # TODO rename this guy
 from sxp import Factory
-from terrestrial import TerrestrialPartition
 
 """
 Usage:
 python3 plan_rocket_depot.py ../factorio/sxp.json
 """
+
+
+class RocketDepotPartition(OpinionatedPartition):
+    def allow_recipe(self, recipe):
+        return not recipe.is_space_only()
 
 
 def calculate_production(factory, conf):
@@ -16,14 +21,14 @@ def calculate_production(factory, conf):
     of each recipe to make, what machine each recipe should be made in,
     and what productivity bonus is assumed
     """
-    terrestrial_partition = TerrestrialPartition(factory)
+    partition = RocketDepotPartition(set(conf.bus_inputs.keys()))
     module_manager = ProductivityPlanner(
         factory.limitations,
-        terrestrial_partition.recipes_to_machines,
+        partition.recipes_to_machines,
         conf.get_productivity_module(),
     )
     plan = ProductionPlanner(
-        conf.bus_inputs, conf.base_outputs, terrestrial_partition, module_manager
+        conf.bus_inputs, conf.base_outputs, partition, module_manager
     )
 
     print("Unmet demands:")
@@ -31,7 +36,7 @@ def calculate_production(factory, conf):
         [
             k
             for k in plan._unmet_demand
-            if terrestrial_partition.items_to_recipes[k] not in plan.recipe_rates
+            if partition.items_to_recipes[k] not in plan.recipe_rates
         ]
     )
 
@@ -40,8 +45,7 @@ def calculate_production(factory, conf):
         {
             k: v
             for k, v in plan._unmet_demand.items()
-            if terrestrial_partition.items_to_recipes[k] in plan.recipe_rates
-            and v > 1e-10
+            if partition.items_to_recipes[k] in plan.recipe_rates and v > 1e-10
         }
     )
 
