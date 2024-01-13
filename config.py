@@ -23,6 +23,11 @@ class Config:
         self.peak_outputs = peak_outputs
         self.modules = modules
 
+    def get_productivity_module(self):
+        if self.modules:
+            return self.modules.get("productivity")
+        return None
+
     @classmethod
     def of(cls, data, factory):
         time_unit = data["config"]["time-unit"]
