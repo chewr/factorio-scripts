@@ -21,6 +21,22 @@ def linearize_recipes(available_recipes, base_ingredients, reverse=False):
     return linearized_recipes
 
 
+def fill_intermediates(provided_input, desired_outputs, items_to_recipes):
+    # Gather recipes
+    q = [items_to_recipes[recipe] for recipe in desired_outputs - provided_input]
+    seen = set()
+    while q:
+        cur = q.pop()
+        if cur in seen:
+            continue
+        seen.add(cur)
+        for ingredient in cur.ingredients:
+            if ingredient in provided_input:
+                continue
+            q.append(items_to_recipes[ingredient])
+    return seen
+
+
 class ProductionPlanner:
     def __init__(self, provided_input, desired_outputs, partition, productivity):
         self._input = provided_input
@@ -28,39 +44,27 @@ class ProductionPlanner:
         self._constraints = partition
         self._machines = productivity
 
-        # Gather recipes
-        recipes = set()
-        q = [
-            self._constraints.items_to_recipes[recipe]
-            for recipe in desired_outputs.keys() - provided_input.keys()
-        ]
-        seen = set()
-        while q:
-            cur = q.pop()
-            if cur in seen:
-                continue
-            seen.add(cur)
-            recipes.add(cur)
-            for ingredient in cur.ingredients:
-                if ingredient in self._input:
-                    continue
-                q.append(self._constraints.items_to_recipes[ingredient])
+        # Fill in all the recipes between inputs and outputs
+        all_recipes = fill_intermediates(
+            self._input.keys(), self._output.keys(), self._constraints.items_to_recipes
+        )
 
         # Topologically sort recipes
         linearized_recipes = linearize_recipes(
-            recipes, set(self._input.keys()), reverse=True
+            all_recipes, set(self._input.keys()), reverse=True
         )
 
-        unmet_demand = self._output.copy()
+        unmet_demand = {
+            itm: desired - self._input.get(itm, 0)
+            for itm, desired in self._output.items()
+            if desired > self._input.get(itm, 0)
+        }
         self.recipe_rates = {}
         self.productivity_by_recipe = {}
         self.machine_requirements = {}
         for recipe in linearized_recipes:
             # Calculate production
-            items_requested = {
-                itm: unmet_demand[itm]
-                for itm in recipe.outputs.keys() & unmet_demand.keys()
-            }
+            items_requested = {itm: unmet_demand[itm] for itm in recipe.outputs.keys()}
             (
                 machine_type,
                 count,
@@ -78,12 +82,12 @@ class ProductionPlanner:
             for item in items_requested.keys():
                 unmet_demand[item] -= recipe.get_yield(item, productivity)
 
-            self._unmet_demand = unmet_demand
-
             # Update statistics
             self.recipe_rates[recipe] = recipes_per_second
             self.productivity_by_recipe[recipe] = productivity
             self.machine_requirements[recipe] = (machine_type, count)
+
+        self._unmet_demand = unmet_demand
 
     def get_recipe_rate(self, recipe):
         return self.recipe_rates[recipe]
