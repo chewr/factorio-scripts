@@ -1,5 +1,7 @@
 from partition import Partition
 
+ETA = 1e-10
+
 
 class OpinionatedPartition(Partition):
     def __init__(self, base_ingredients):
@@ -21,11 +23,13 @@ class OpinionatedPartition(Partition):
             available_recipes = item.recipes.keys() & self.recipes
             scored_recipes = []
             for recipe in available_recipes:
-                score = 0
-                score -= 100 * len(recipe.outputs)
-                score -= len(recipe.ingredients)
-                score += recipe.get_yield(item) / recipe.time
-                scored_recipes.append((score, recipe))
+                off_the_bus_percentage = float(
+                    len(recipe.ingredients.keys() & base_ingredients)
+                ) / (float(len(recipe.ingredients)) + ETA)
+                multi_output_penalty = 1.0 / len(recipe.outputs)
+
+                weight = (multi_output_penalty, off_the_bus_percentage)
+                scored_recipes.append((weight, recipe))
             preferred_recipes[item] = max(scored_recipes)[1]
 
         self.items_to_recipes = preferred_recipes
