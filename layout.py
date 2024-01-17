@@ -12,10 +12,14 @@ SUSHI_BELT_WIDTH = 3
 MACHINE_WIDTH = 3
 SPACES = 2
 LANE_WIDTH = 0.5
+MAX_REACHABLE_LANES = 6
 
 
 @dataclass(frozen=True)
 class RecipeRequirement:
+    # [functionality] TODO: This is evovling into a thing that needs to do two things:
+    # - holding recipe metadata like the machine and rrpm. It should also hold onto productivity to make life easier
+    # - Holding state for how many machines have been created. This should probably be outside the class
     recipe_rate_per_machine: float
     machines_required: int
     machine: FacilityItem
@@ -27,6 +31,13 @@ class RecipeRequirement:
             recipe_rate_per_machine=planner.get_recipe_rate(recipe) / machines_required,
             machines_required=int(machines_required),
             machine=machine,
+        )
+
+    def decrement(self):
+        return RecipeRequirement(
+            recipe_rate_per_machine=self.recipe_rate_per_machine,
+            machines_requires=self.machines_required - 1,
+            machine=self.machine,
         )
 
 
@@ -71,6 +82,19 @@ class Aisle:
                 (entry["recipe"], entry["machine"]) for entry in data["machines"]
             ],
         )
+
+    def get_actions(self, bus_items):
+        actions = []
+        # [optimization] TODO: include TerminateAisle in fewer cases
+        # Confusingly we could choose to handle this at the MachineAction level by deleting
+        # those items from the bus
+        if self.machines:
+            actions.append(TerminateAisle())
+        if len(self.lanes) >= MAX_REACHABLE_LANES:
+            return actions
+        # [optimization] TODO: consider only the lanes which can be used in remaining recipes
+        actions.extend([AddLane(item) for item in bus_items - self.lanes])
+        return actions
 
 
 @dataclass(frozen=True)
@@ -126,16 +150,75 @@ class Node:
 
     @classmethod
     def from_layout(cls, bus_source, planner, recipes, layout):
-        # [functionality]TODO iterate over layout and initialize bus inputs, belt contents, production, and remaining recipes
-        raise NotImplementedError
+        belt_contents = {}
+        current_production = {}
+        remaining_recipes = {
+            recipe: RecipeRequirement.of(recipe, planner) for recipe in recipes
+        }
+        for aisle in layout.aisles:
+            for recipe, actual_machine in aisle.machines:
+                productivity = planner.get_productivity(recipe)
+                desired_machine, machines_required = planner.get_machine_requirements(
+                    recipe
+                )
+                if desired_machine != actual_machine:
+                    raise ValueError(
+                        f"Got unexpected machine type for recipe {recipe}: {actual_machine} != {desired_machine}"
+                    )
+                recipe_rate_per_machine = (
+                    planner.get_recipe_rate(recipe) / machines_required
+                )
+
+                # update current_production
+                current_production[recipe] = (
+                    current_production.get(recipe, 0) + recipe_rate_per_machine
+                )
+
+                # Deduct from remaining_recipes
+                current_requirements = remaining_recipes[recipe]
+                updated_requirements = current_requirements.decrement()
+                if updated_requirements.machines_required == 0:
+                    del remaining_recipes[recipe]
+                else:
+                    remaining_recipes[recipe] = updated_requirements
+
+                # Update belt contents
+                for item, consumed in recipe.ingredients.items():
+                    if item in bus_source:
+                        continue
+                    belt_contents[item] -= consumed * recipe_rate_per_machine
+                for item in recipe.outputs:
+                    belt_contents[item] = (
+                        belt_contents.get(item, 0)
+                        + recipe.get_yield(item, productivity) * recipe_rate_per_machine
+                    )
+        return cls(
+            layout=layout,
+            bus_items=bus_source.keys(),
+            belt_contents=belt_contents,
+            current_production=current_production,
+            remaining_recipes=remaining_recipes,
+            current_aisle=Aisle.empty(),
+        )
 
     def get_actions(self):
         # [optimization]TODO Does it make sense to compute next actions here or in the monolith?
-        lane_actions = current_aisle.get_actions(
-            self.bus_items
-        )  # [functionality]TODO Implement this method which returns the lanes that can be added
-        machine_actions = None  # [functionality]TODO determine machine actions from current_aisle.lanes, self.remaining_recipes, and self.belt_contents
+        lane_actions = self.current_aisle.get_actions(self.bus_items)
+
         # [optimization]TODO Does it make sense to precompute/save the recipe options at all?
+        machine_actions = []
+        available_items = self.current_aisle.lanes | self.belt_contents.keys()
+        for recipe, requirements in self.remaining_recipes.items():
+            if recipe.ingredients.keys() <= available_items:
+                if all(
+                    [
+                        amount_required * requirements.recipe_rate_per_machine
+                        < self.belt_contents[ingredient]
+                        for ingredient, amount_required in recipe.ingredients.items()
+                        if ingredient in self.belt_contents
+                    ]
+                ):
+                    machine_actions.append(AddMachine(recipe, requirements.machine))
         return lane_actions + machine_actions
 
 
@@ -173,29 +256,45 @@ class AddMachine(Action):
         self.facility = facility
 
     def apply(self, node: Node) -> Node:
-        raise NotImplementedError
-        belt_contents_updated = deepcopy(node.belt_contents)
-        # [functionality]TODO: update belt contents with machine input/outputs
+        recipe_details = node.remaining_recipes[self.recipe]
+        productivity = 1.0  # [functionality] TODO: productivity should probably come from the recipe details
 
-        remaining_recipes_updated = deepcopy(node.remaining_recipes)
-        # [functionality]TODO: update remaining recipes by decrementing the required machines
+        belt_contents = deepcopy(node.belt_contents)
+        for item, amount in self.recipe.ingredients.items():
+            belt_contents[item] -= amount * recipe_details.recipe_rate_per_machine
+        for item in self.recipe.outputs:
+            belt_contents[item] = (
+                belt_contents.get(item, 0)
+                + self.recipe.get_yield(item, productivity)
+                * recipe_details.recipe_rate_per_machine
+            )
 
-        current_production_updated = deepcopy(node.current_production)
-        # [functionality]TODO: update current production
+        remaining_recipes = deepcopy(node.remaining_recipes)
+        requirements = remaining_recipes[self.recipe].decrement()
+        if requirements.machines_required == 0:
+            del remaining_recipes[self.recipe]
+        else:
+            remaining_recipes[self.recipe] = requirements
 
-        aisle_machines_updated = deepcopy(node.aisle.machines)
-        aisle_machines_updated.append((self.recipe, self.facility))
-        aisle_updated = Aisle(
+        current_production = deepcopy(node.current_production)
+        current_production[self.recipe] = (
+            current_production.get(self.recipe, 0)
+            + recipe_details.recipe_rate_per_machine
+        )
+
+        aisle_machines = deepcopy(node.aisle.machines)
+        aisle_machines.append((self.recipe, self.facility))
+        aisle = Aisle(
             lanes=node.aisle.lanes,
-            machines=aisle_machines_updated,
+            machines=aisle_machines,
         )
         return Node(
             layout=node.layout,
             bus_items=node.bus_items,
-            belt_contents=belt_contents_updated,
-            current_production=current_production_updated,
-            remaining_recipes=remaining_recipes_updated,
-            current_aisle=aisle_updated,
+            belt_contents=belt_contents,
+            current_production=current_production,
+            remaining_recipes=remaining_recipes,
+            current_aisle=aisle,
         )
 
 
@@ -225,6 +324,8 @@ class Strategy(ABC):
 
 class LayoutPlanner:
     def __init__(self, bus_items, recipes, production_planner, initial_state=None):
+        # [functionality] TODO: To make sure that we can terminate, we should avoid recipes with > MAX_REACHABLE_LANES
+        # bus ingredients, or seed the belt contents with some ingredients from the bus.
         if not initial_state:
             initial_state = Node.initial(bus_items, recipes, production_planner)
         # Initial state for search
