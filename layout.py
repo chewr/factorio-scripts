@@ -366,11 +366,13 @@ class ActionHeuristic(ABC):
 
 
 class BasicHeuristic(ActionHeuristic):
-    def __init__(self, recipes, partition):
+    def __init__(self, bus_items, recipes, partition):
         # Precompute heuristics
 
+        self._bus_items = set(bus_items)
+
         # Static significance - how many items depend on a given recipe
-        linearized_recipes = linearize_recipes(recipes, reverse=True)
+        linearized_recipes = linearize_recipes(recipes, self._bus_items, reverse=True)
         static_significance = {}
         for recipe in linearized_recipes:
             # Because the recipes are in reverse toposort, we can be assured
@@ -379,6 +381,8 @@ class BasicHeuristic(ActionHeuristic):
             # to its own product(s)
             static_significance.setdefault(recipe, 1)
             for ingredient in recipe.ingredients:
+                if ingredient in bus_items:
+                    continue
                 source_recipe = partition.items_to_recipes[ingredient]
                 static_significance[source_recipe] = (
                     static_significance.get(source_recipe, 1)
@@ -390,26 +394,58 @@ class BasicHeuristic(ActionHeuristic):
         # - Dynamic significance, which should discount dependents which can already be achieved with current production
         # - Prioritize recipes which use more of the available lanes in the aisle
 
-    def get_maximal_recipe_significance(self, recipe):
-        return self._static_significance[recipe]
-
-    def _score_add_lane(self, node: Node, action):
-        # TODO[functionality] Implement this
-        # It needs to know about the required recipes, the current items on belt, and the current lanes
+    def _score_add_lane(self, node: Node, action: AddLane):
+        # TODO[optimization] Improve this rough approximation
+        # This current filter is very rough but a filter that looks at the actually achievable recipes based
+        # on current state of belt contents and aisle lanes could work. Better yet, it would be nice if the
+        # action itself memoized that since we've already computed it
         # It should -1 if no recipes require self.item
         # If recipes require self.item it should return a value that is correlated positively with:
         # - The significance of the recipes
         # - The number of recipes
         # - The number of recipes that require self.item as well as items already in the lane
-        raise NotImplementedError
+        achievable_recipes = {}
+        for recipe, requirements in node.remaining_recipes.items():
+            details, weight = requirements
+            base_ingredients = recipe.ingredients.keys() & self._bus_items
+            if all(
+                [
+                    node.belt_contents.get(ingredient, 0)
+                    > details.recipe_rate_per_machine * required - ETA
+                    for ingredient, required in recipe.ingredients.items()
+                    if ingredient not in self._bus_items
+                ]
+            ):
+                if (
+                    len(base_ingredients | node.current_aisle.lanes)
+                    <= MAX_REACHABLE_LANES
+                ):
+                    achievable_recipes[recipe] = (
+                        self._static_significance[recipe],
+                        len(base_ingredients),
+                        weight,
+                    )
+        if not achievable_recipes:
+            # TODO[quality] This tuple return type thing is pretty unintuitive
+            # Sorted from least to greatest: [(), (-1,), (0,), (0, 9, 9, 9), (1, 1, 1), (1, 2, 3, 4, 5, 6), (45, 1, 2)]
+            return ()
 
-    def _score_add_machine(self, node: Node, action):
-        # TODO[functionality] Implement this
-        # It should return a positive number that correlates with the actual or dynamic significance of the recipe
-        raise NotImplementedError
+        most_significance = max(
+            [significance for significance, _, __ in achievable_recipes.values()]
+        )
+        average_weighted_uniqueness = sum(
+            [uniqueness**2 for _, uniqueness, __ in achievable_recipes.values()]
+        ) / len(achievable_recipes)
+        machine_weight = sum([weight for _, __, weight in achievable_recipes.values()])
+        return (0, most_significance, average_weighted_uniqueness, machine_weight)
+
+    def _score_add_machine(self, node: Node, action: AddMachine):
+        significance = self._static_significance[action.recipe]
+        uniqueness = len(action.recipe.ingredients.keys() & self._bus_items)
+        return (significance, uniqueness)
 
     def _score_terminate(self, *_):
-        return 0
+        return (0,)
 
 
 class Strategy(ABC):
@@ -467,6 +503,29 @@ class HeuristicStrategy(BasicStrategy):
     def get_actions(self, node: Node) -> List[Action]:
         return sorted(
             super().get_actions(node),
+            key=lambda action: self._heuristic.score_action(node, action),
+            reverse=True,
+        )
+
+
+class FasterHeuristicStrategy(Strategy):
+    def __init__(self, heuristic):
+        super().__init__()
+        self._heuristic = heuristic
+
+    def get_actions(self, node: Node) -> List[Action]:
+        actions = node.get_actions()
+        machine_actions = [
+            action for action in actions if isinstance(action, AddMachine)
+        ]
+        if machine_actions:
+            return sorted(
+                machine_actions,
+                key=lambda action: self._heuristic.score_action(node, action),
+                reverse=True,
+            )
+        return sorted(
+            actions,
             key=lambda action: self._heuristic.score_action(node, action),
             reverse=True,
         )

@@ -1,5 +1,5 @@
 from config import Config, load_parameters
-from layout import BasicStrategy, LayoutPlanner
+from layout import BasicHeuristic, FasterHeuristicStrategy, LayoutPlanner
 from opinions import OpinionatedPartition
 from planner import ProductionPlanner
 from productivity import ProductivityPlanner  # TODO rename this guy
@@ -32,14 +32,22 @@ def calculate_production(factory, conf):
         conf.bus_inputs, conf.base_outputs, partition, module_manager
     )
     searcher = LayoutPlanner(conf.bus_inputs.keys(), plan.recipe_rates.keys(), plan)
-    strategy = BasicStrategy()
+    heuristic = BasicHeuristic(
+        set(conf.bus_inputs.keys()), plan.recipe_rates.keys(), partition
+    )
+    strategy = FasterHeuristicStrategy(heuristic)
     from datetime import datetime
 
     start = datetime.now()
     layout = searcher.plan_layout(strategy)
     duration = datetime.now() - start
+    layout_fp = "generated.yml"
+    with open(layout_fp, "w") as f:
+        import yaml
+
+        yaml.safe_dump(layout.to_yaml(), f)
     print(
-        f"Found layout in {duration.total_seconds()} seconds. Score: {layout.get_score()}"
+        f"Found layout in {duration.total_seconds()} seconds. Score: {layout.get_score()}. See {layout_fp}"
     )
 
 
