@@ -4,7 +4,6 @@ from copy import deepcopy
 from dataclasses import dataclass
 from typing import Dict, List, Set, Tuple
 
-from planner import linearize_recipes
 from sxp import BaseItem, BaseRecipe, FacilityItem
 
 MACHINES_PER_BANK = 26
@@ -16,28 +15,19 @@ MAX_REACHABLE_LANES = 6
 
 
 @dataclass(frozen=True)
-class RecipeRequirement:
-    # [functionality] TODO: This is evovling into a thing that needs to do two things:
-    # - holding recipe metadata like the machine and rrpm. It should also hold onto productivity to make life easier
-    # - Holding state for how many machines have been created. This should probably be outside the class
+class RecipeDetails:
     recipe_rate_per_machine: float
-    machines_required: int
+    productivity: float
     machine: FacilityItem
 
     @classmethod
     def of(cls, recipe, planner):
         machine, machines_required = planner.get_machine_requirements(recipe)
+        productivity = planner.get_productivity(recipe)
         return cls(
             recipe_rate_per_machine=planner.get_recipe_rate(recipe) / machines_required,
-            machines_required=int(machines_required),
             machine=machine,
-        )
-
-    def decrement(self):
-        return RecipeRequirement(
-            recipe_rate_per_machine=self.recipe_rate_per_machine,
-            machines_requires=self.machines_required - 1,
-            machine=self.machine,
+            productivity=productivity,
         )
 
 
@@ -126,7 +116,9 @@ class Node:
     ]  # [optimization]TODO Does it make sense to carry this with us everywhere?
     belt_contents: Dict[BaseItem, float]
     current_production: Dict[BaseRecipe, float]
-    remaining_recipes: Dict[BaseRecipe, RecipeRequirement]
+    remaining_recipes: Dict[
+        BaseRecipe, Tuple(RecipeDetails, int)
+    ]  # TODO gotta update usages
     current_aisle: Aisle
 
     def get_layout(self):
@@ -143,7 +135,11 @@ class Node:
             belt_contents={},
             current_production={},
             remaining_recipes={
-                recipe: RecipeRequirement.of(recipe, planner) for recipe in recipes
+                recipe: (
+                    RecipeDetails.of(recipe, planner),
+                    planner.get_machine_requirements(recipe)[1],
+                )
+                for recipe in recipes
             },
             current_aisle=Aisle.empty(),
         )
@@ -153,7 +149,11 @@ class Node:
         belt_contents = {}
         current_production = {}
         remaining_recipes = {
-            recipe: RecipeRequirement.of(recipe, planner) for recipe in recipes
+            recipe: (
+                RecipeDetails.of(recipe, planner),
+                planner.get_machine_requirements(recipe)[1],
+            )
+            for recipe in recipes
         }
         for aisle in layout.aisles:
             for recipe, actual_machine in aisle.machines:
@@ -175,12 +175,12 @@ class Node:
                 )
 
                 # Deduct from remaining_recipes
-                current_requirements = remaining_recipes[recipe]
-                updated_requirements = current_requirements.decrement()
-                if updated_requirements.machines_required == 0:
+                recipe_details, current_requirements = remaining_recipes[recipe]
+                updated_requirements = current_requirements - 1
+                if updated_requirements == 0:
                     del remaining_recipes[recipe]
                 else:
-                    remaining_recipes[recipe] = updated_requirements
+                    remaining_recipes[recipe] = (recipe_details, updated_requirements)
 
                 # Update belt contents
                 for item, consumed in recipe.ingredients.items():
@@ -257,7 +257,7 @@ class AddMachine(Action):
 
     def apply(self, node: Node) -> Node:
         recipe_details = node.remaining_recipes[self.recipe]
-        productivity = 1.0  # [functionality] TODO: productivity should probably come from the recipe details
+        productivity = recipe_details.productivity
 
         belt_contents = deepcopy(node.belt_contents)
         for item, amount in self.recipe.ingredients.items():
@@ -270,11 +270,12 @@ class AddMachine(Action):
             )
 
         remaining_recipes = deepcopy(node.remaining_recipes)
-        requirements = remaining_recipes[self.recipe].decrement()
-        if requirements.machines_required == 0:
+        recipe_details, requirements = remaining_recipes[self.recipe]
+        requirements -= 1
+        if requirements == 0:
             del remaining_recipes[self.recipe]
         else:
-            remaining_recipes[self.recipe] = requirements
+            remaining_recipes[self.recipe] = (recipe_details, requirements)
 
         current_production = deepcopy(node.current_production)
         current_production[self.recipe] = (
