@@ -4,6 +4,7 @@ from copy import deepcopy
 from dataclasses import dataclass
 from typing import Dict, List, Set, Tuple
 
+from planner import linearize_recipes
 from sxp import BaseItem, BaseRecipe, FacilityItem
 
 MACHINES_PER_BANK = 26
@@ -33,8 +34,8 @@ class RecipeDetails:
 
 @dataclass(frozen=True)
 class Aisle:
-    # [optimization]TODO this doesn't handle having >6 lanes (separate items reachable for top machiens and bottom mochines
-    # [extension]TODO we're also not currently handling per-lane throughput or keeping track of lane exhaustion
+    # TODO[optimization] this doesn't handle having >6 lanes (separate items reachable for top machiens and bottom mochines
+    # TODO[extension] we're also not currently handling per-lane throughput or keeping track of lane exhaustion
     lanes: Set[BaseItem]
     machines: List[Tuple[BaseRecipe, FacilityItem]]
 
@@ -56,7 +57,7 @@ class Aisle:
 
     def get_space(self):
         banks = 1 + len(self.machines) / MACHINES_PER_BANK
-        # [extension]TODO this isn't perfectly reflective of reality as there is some rearrangement that can make some
+        # TODO[extension] this isn't perfectly reflective of reality as there is some rearrangement that can make some
         # single-bank arrangements a bit narrower, but it's good enough for now
         return (
             banks * (MACHINE_WIDTH + SPACES)
@@ -73,18 +74,35 @@ class Aisle:
             ],
         )
 
-    def get_actions(self, bus_items):
-        actions = []
-        # [optimization] TODO: include TerminateAisle in fewer cases
-        # Confusingly we could choose to handle this at the MachineAction level by deleting
-        # those items from the bus
-        if self.machines:
-            actions.append(TerminateAisle())
-        if len(self.lanes) >= MAX_REACHABLE_LANES:
-            return actions
-        # [optimization] TODO: consider only the lanes which can be used in remaining recipes
-        actions.extend([AddLane(item) for item in bus_items - self.lanes])
-        return actions
+    def get_actions(self, bus_items, belt_contents, recipe_requirements):
+        if len(self.machines) >= 2 * MACHINES_PER_BANK:
+            return [TerminateAisle()]
+
+        machine_actions = []
+        lane_actions = []
+        for recipe, requirements in recipe_requirements.items():
+            details, _ = requirements
+            base_ingredients = recipe.ingredients.keys() & bus_items
+            if all(
+                [
+                    belt_contents.get(ingredient, 0)
+                    >= details.recipe_rate_per_machine * required
+                    for ingredient, required in recipe.ingredients.items()
+                    if ingredient not in bus_items
+                ]
+            ):
+                if base_ingredients <= self.lanes:
+                    machine_actions.append(AddMachine(recipe, details.machine))
+                elif (base_ingredients | self.lanes) <= MAX_REACHABLE_LANES:
+                    lane_actions.extend(
+                        [AddLane(item) for item in base_ingredients - self.lanes]
+                    )
+
+        if self.machines and not machine_actions and not lane_actions:
+            # Returning an empty list is meaningful, so in order to ensure
+            # convergence we only allow aisle termination if progress has been made
+            return [TerminateAisle()]
+        return machine_actions + lane_actions
 
 
 @dataclass(frozen=True)
@@ -104,7 +122,7 @@ class Layout:
         return sum([aisle.get_space() for aisle in self.aisles])
 
     def get_score(self):
-        # [optimization]TODO Open to having other metrics than space; e.g. simpler lanes
+        # TODO[optimization] Open to having other metrics than space; e.g. simpler lanes
         return self.get_space()
 
 
@@ -113,12 +131,10 @@ class Node:
     layout: Layout
     bus_items: Set[
         BaseItem
-    ]  # [optimization]TODO Does it make sense to carry this with us everywhere?
+    ]  # TODO[optimization] Does it make sense to carry this with us everywhere?
     belt_contents: Dict[BaseItem, float]
     current_production: Dict[BaseRecipe, float]
-    remaining_recipes: Dict[
-        BaseRecipe, Tuple(RecipeDetails, int)
-    ]  # TODO gotta update usages
+    remaining_recipes: Dict[BaseRecipe, Tuple(RecipeDetails, int)]
     current_aisle: Aisle
 
     def get_layout(self):
@@ -126,6 +142,10 @@ class Node:
 
     def has_remaining_recipes(self):
         return len(self.remaining_recipes) > 0
+
+    def is_goal_state(self):
+        hanging_aisle = len(self.current_aisle.machines) == 0
+        return not (self.has_remaining_recipes() or hanging_aisle)
 
     @classmethod
     def initial(cls, bus_items, planner, recipes):
@@ -202,35 +222,49 @@ class Node:
         )
 
     def get_actions(self):
-        # [optimization]TODO Does it make sense to compute next actions here or in the monolith?
-        lane_actions = self.current_aisle.get_actions(self.bus_items)
-
-        # [optimization]TODO Does it make sense to precompute/save the recipe options at all?
-        machine_actions = []
-        available_items = self.current_aisle.lanes | self.belt_contents.keys()
-        for recipe, requirements in self.remaining_recipes.items():
-            if recipe.ingredients.keys() <= available_items:
-                if all(
-                    [
-                        amount_required * requirements.recipe_rate_per_machine
-                        < self.belt_contents[ingredient]
-                        for ingredient, amount_required in recipe.ingredients.items()
-                        if ingredient in self.belt_contents
-                    ]
-                ):
-                    machine_actions.append(AddMachine(recipe, requirements.machine))
-        return lane_actions + machine_actions
+        return self.current_aisle.get_actions(
+            self.bus_items, self.belt_contents, self.remaining_recipes
+        )
 
 
 class Action(ABC):
+    # TODO[quality] Need a better API on the Action for heuristics
     @abstractmethod
     def apply(self, node: Node) -> Node:
         pass
+
+    @abstractmethod
+    # TODO[functionality] figure out what this needs to take
+    #   If we assume Action is a pretty finite and well defined
+    #   interface (i.e. that there are and will ever be only three
+    #   action subtypes), I think it makes sense to write a Heuristic
+    #   interface which takes the Action as input and implementst a
+    #   specific heuristic function for each type of action. This
+    #   makes it a bit hard to directly compare across action types
+    #   but if we want to commit to preferring machines over lanes
+    #   for instance, this could work well.
+    #   Another option is to define a Heuristic interface that
+    #   computes the heuristic function on a Node. We should avoid
+    #   making a heuristic function which looks too far ahead or is
+    #   overly complex in time or space as that is more the purview
+    #   of the Strategy
+    def score(self, TODO_param):
+        return 0
 
 
 class AddLane(Action):
     def __init__(self, item):
         self.item = item
+
+    def score(self, TODO_param):
+        # TODO[functionality] Implement this
+        # It needs to know about the required recipes, the current items on belt, and the current lanes
+        # It should -1 if no recipes require self.item
+        # If recipes require self.item it should return a value that is correlated positively with:
+        # - The significance of the recipes
+        # - The number of recipes
+        # - The number of recipes that require self.item as well as items already in the lane
+        raise NotImplementedError
 
     def apply(self, node: Node) -> Node:
         current_aisle = node.aisle
@@ -254,6 +288,11 @@ class AddMachine(Action):
     def __init__(self, recipe, facility):
         self.recipe = recipe
         self.facility = facility
+
+    def score(self, TODO_param):
+        # TODO[functionality] Implement this
+        # It should return a positive number that correlates with the actual or dynamic significance of the recipe
+        raise NotImplementedError
 
     def apply(self, node: Node) -> Node:
         recipe_details = node.remaining_recipes[self.recipe]
@@ -300,6 +339,9 @@ class AddMachine(Action):
 
 
 class TerminateAisle(Action):
+    def score(self, _):
+        return 0
+
     def apply(self, node: Node) -> Node:
         current_layout = node.layout
         aisles_updated = deepcopy(current_layout.aisles)
@@ -324,34 +366,82 @@ class Strategy(ABC):
 
 
 class LayoutPlanner:
-    def __init__(self, bus_items, recipes, production_planner, initial_state=None):
-        # [functionality] TODO: To make sure that we can terminate, we should avoid recipes with > MAX_REACHABLE_LANES
+    def __init__(
+        self, bus_items, recipes, production_planner, partition, initial_state=None
+    ):
+        # TODO[quality] this is kinda jank looking
+        # for one, this could theoretically (it won't with current inputs) break the dependencies as written
+        # A totally alternative strategy is to seed the belt with some bus items, but that opens a different can of worms
+        assignable_recipes = [
+            recipe
+            for recipe in recipes
+            if len(recipe.ingredients.keys() & bus_items) <= MAX_REACHABLE_LANES
+        ]
         # bus ingredients, or seed the belt contents with some ingredients from the bus.
         if not initial_state:
-            initial_state = Node.initial(bus_items, recipes, production_planner)
+            initial_state = Node.initial(
+                bus_items, assignable_recipes, production_planner
+            )
         # Initial state for search
         self._initial_state = initial_state
 
         # Precompute heuristics
-        raise NotImplementedError
+
+        # TODO[extension] Subclass this and move heuristics into subclasses to leverage
+        # polymorphism for extending heuristics
+
+        # Static significance - how many items depend on a given recipe
+        linearized_recipes = linearize_recipes(assignable_recipes, reverse=True)
+        static_significance = {}
+        for recipe in linearized_recipes:
+            # Because the recipes are in reverse toposort, we can be assured
+            # that when we see recipe i, we have already seen all recipes which use
+            # recipe i. If recipe i has not yet been recorded, it is only relevant
+            # to its own product(s)
+            static_significance.setdefault(recipe, 1)
+            for ingredient in recipe.ingredients:
+                source_recipe = partition.items_to_recipes[ingredient]
+                static_significance[source_recipe] = (
+                    static_significance.get(source_recipe, 1)
+                    + static_significance[recipe]
+                )
+        self._static_significance = static_significance
+
+        # TODO[extension] More heuristic ideas
+        # - Dynamic significance, which should discount dependents which can already be achieved with current production
+        # - Prioritize recipes which use more of the available lanes in the aisle
 
     def get_maximal_recipe_significance(self, recipe):
-        # Best-case recipe significance: in how many recipes are this recipe's products used?
-        # [functionality]TODO: precompute heuristic
-        raise NotImplementedError
-
-    def get_actual_recipe_significance(self, recipe, existing_production):
-        # Actual recipe significance:
-        # - Construct a forest of recipe dependency digraphs
-        # - Maintain a lookup table to quickly find any node in the forest
-        # - To determine the significance of a recipe, find the size of its child tree, terminating the search at any products that are already fully produced
-        # [functionality]TODO: precompute heuristic
-        raise NotImplementedError
+        return self._static_significance[recipe]
 
     def plan_layout(self, strategy: Strategy) -> Layout:
-        node = self._initial_state
-        while node.has_remaining_recipes():
-            action = strategy.get_next_action(node)
-            node = action.apply(node)
+        initial_node = self._initial_state
 
-        return node.get_layout()
+        final_node = self._plan_layout_recursive(initial_node, strategy)
+
+        return final_node.get_layout()
+
+    @classmethod
+    def _plan_layout_recursive(cls, node: Node, strategy: Strategy):
+        for action in strategy.get_actions(node):
+            child = action.apply(node)
+            if child.is_goal_state():
+                return child
+            result = cls._plan_layout_recursive(child, strategy)
+            if result is not None:
+                return result
+        return None
+
+
+class BasicStrategy(Strategy):
+    # TODO[optimization] Write more strategies
+    def get_actions(self, node: Node) -> List[Action]:
+        return node.get_actions()
+
+
+class HeuristicStrategy(BasicStrategy):
+    def __init__(self, heuristic):
+        self._heuristic = heuristic
+
+    def get_actions(self, node: Node) -> List[Action]:
+        return sorted(super().get_actions(node), key=self._heuristic.score)

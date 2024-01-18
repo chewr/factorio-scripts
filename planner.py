@@ -1,4 +1,6 @@
 def linearize_recipes(available_recipes, base_ingredients, reverse=False):
+    # TODO add a pydoc that indicates which direction this linearizes.
+    # I think that if X depends on Y, then Y is left of X
     linearized_recipes = []
     available_ingredients = base_ingredients.copy()
     q = [r for r in available_recipes if r.ingredients.keys() <= available_ingredients]
