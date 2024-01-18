@@ -1,4 +1,5 @@
 from config import Config, load_parameters
+from layout import BasicStrategy, LayoutPlanner
 from opinions import OpinionatedPartition
 from planner import ProductionPlanner
 from productivity import ProductivityPlanner  # TODO rename this guy
@@ -30,6 +31,16 @@ def calculate_production(factory, conf):
     plan = ProductionPlanner(
         conf.bus_inputs, conf.base_outputs, partition, module_manager
     )
+    searcher = LayoutPlanner(conf.bus_inputs.keys(), plan.recipe_rates.keys(), plan)
+    strategy = BasicStrategy()
+    from datetime import datetime
+
+    start = datetime.now()
+    layout = searcher.plan_layout(strategy)
+    duration = datetime.now() - start
+    print(
+        f"Found layout in {duration.total_seconds()} seconds. Score: {layout.get_score()}"
+    )
 
 
 def create_sushi_layout(
@@ -52,7 +63,7 @@ def main(factory_data_file, *args):
     parameters = load_parameters("parameters.yml")
     conf = Config.of(parameters, factory)
 
-    plan = calculate_production(factory, conf)
+    calculate_production(factory, conf)
 
 
 if __name__ == "__main__":

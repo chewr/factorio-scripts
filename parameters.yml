@@ -178,7 +178,7 @@ base-outputs:
   se-spaceship-gate: 1
   se-lifesupport-facility: 0.01
   night-vision-equipment: 0.0001
-  se-space-capsule: 0.1
+  # se-space-capsule: 0.1 This has too many bussed ingredients and I'm not sure how best to handle that yet
   pipe: 25
   car: 0.001
   fluid-wagon: 0.5

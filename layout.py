@@ -1,6 +1,5 @@
 import math
 from abc import ABC, abstractmethod
-from copy import deepcopy
 from dataclasses import dataclass
 from typing import Dict, List, Set, Tuple
 
@@ -10,9 +9,10 @@ from sxp import BaseItem, BaseRecipe, FacilityItem
 MACHINES_PER_BANK = 26
 SUSHI_BELT_WIDTH = 3
 MACHINE_WIDTH = 3
-SPACES = 2
+INSERTER_SPACES = 2
 LANE_WIDTH = 0.5
 MAX_REACHABLE_LANES = 6
+ETA = 1e-10
 
 
 @dataclass(frozen=True)
@@ -60,7 +60,7 @@ class Aisle:
         # TODO[extension] this isn't perfectly reflective of reality as there is some rearrangement that can make some
         # single-bank arrangements a bit narrower, but it's good enough for now
         return (
-            banks * (MACHINE_WIDTH + SPACES)
+            banks * (MACHINE_WIDTH + INSERTER_SPACES)
             + math.ceil(len(self.lanes) * LANE_WIDTH)
             + 2 * SUSHI_BELT_WIDTH
         )
@@ -86,14 +86,14 @@ class Aisle:
             if all(
                 [
                     belt_contents.get(ingredient, 0)
-                    >= details.recipe_rate_per_machine * required
+                    > details.recipe_rate_per_machine * required - ETA
                     for ingredient, required in recipe.ingredients.items()
                     if ingredient not in bus_items
                 ]
             ):
                 if base_ingredients <= self.lanes:
                     machine_actions.append(AddMachine(recipe, details.machine))
-                elif (base_ingredients | self.lanes) <= MAX_REACHABLE_LANES:
+                elif len(base_ingredients | self.lanes) <= MAX_REACHABLE_LANES:
                     lane_actions.extend(
                         [AddLane(item) for item in base_ingredients - self.lanes]
                     )
@@ -122,8 +122,21 @@ class Layout:
         return sum([aisle.get_space() for aisle in self.aisles])
 
     def get_score(self):
+        total_machines = sum([len(aisle.machines) for aisle in self.aisles])
+        machine_banks = total_machines / MACHINES_PER_BANK
+        full_aisles = machine_banks / 2
+        partial_aisles = machine_banks % 2
+        best_achievable = full_aisles * (
+            2 * (MACHINE_WIDTH + INSERTER_SPACES)
+            + math.ceil(MAX_REACHABLE_LANES * LANE_WIDTH)
+            + 2 * SUSHI_BELT_WIDTH
+        ) + partial_aisles * (
+            (MACHINE_WIDTH + INSERTER_SPACES)
+            + math.ceil(MAX_REACHABLE_LANES * LANE_WIDTH)
+            + 2 * SUSHI_BELT_WIDTH
+        )
         # TODO[optimization] Open to having other metrics than space; e.g. simpler lanes
-        return self.get_space()
+        return round(float(best_achievable) / float(self.get_space()), 3)
 
 
 @dataclass(frozen=True)
@@ -134,11 +147,11 @@ class Node:
     ]  # TODO[optimization] Does it make sense to carry this with us everywhere?
     belt_contents: Dict[BaseItem, float]
     current_production: Dict[BaseRecipe, float]
-    remaining_recipes: Dict[BaseRecipe, Tuple(RecipeDetails, int)]
+    remaining_recipes: Dict[BaseRecipe, Tuple[RecipeDetails, int]]
     current_aisle: Aisle
 
     def get_layout(self):
-        return self._layout
+        return self.layout
 
     def has_remaining_recipes(self):
         return len(self.remaining_recipes) > 0
@@ -148,7 +161,7 @@ class Node:
         return not (self.has_remaining_recipes() or hanging_aisle)
 
     @classmethod
-    def initial(cls, bus_items, planner, recipes):
+    def initial(cls, bus_items, recipes, planner):
         return cls(
             layout=Layout(aisles=[]),
             bus_items=bus_items,
@@ -207,6 +220,8 @@ class Node:
                     if item in bus_source:
                         continue
                     belt_contents[item] -= consumed * recipe_rate_per_machine
+                    if belt_contents[item] < ETA:
+                        del belt_contents[item]
                 for item in recipe.outputs:
                     belt_contents[item] = (
                         belt_contents.get(item, 0)
@@ -228,47 +243,18 @@ class Node:
 
 
 class Action(ABC):
-    # TODO[quality] Need a better API on the Action for heuristics
     @abstractmethod
     def apply(self, node: Node) -> Node:
         pass
-
-    @abstractmethod
-    # TODO[functionality] figure out what this needs to take
-    #   If we assume Action is a pretty finite and well defined
-    #   interface (i.e. that there are and will ever be only three
-    #   action subtypes), I think it makes sense to write a Heuristic
-    #   interface which takes the Action as input and implementst a
-    #   specific heuristic function for each type of action. This
-    #   makes it a bit hard to directly compare across action types
-    #   but if we want to commit to preferring machines over lanes
-    #   for instance, this could work well.
-    #   Another option is to define a Heuristic interface that
-    #   computes the heuristic function on a Node. We should avoid
-    #   making a heuristic function which looks too far ahead or is
-    #   overly complex in time or space as that is more the purview
-    #   of the Strategy
-    def score(self, TODO_param):
-        return 0
 
 
 class AddLane(Action):
     def __init__(self, item):
         self.item = item
 
-    def score(self, TODO_param):
-        # TODO[functionality] Implement this
-        # It needs to know about the required recipes, the current items on belt, and the current lanes
-        # It should -1 if no recipes require self.item
-        # If recipes require self.item it should return a value that is correlated positively with:
-        # - The significance of the recipes
-        # - The number of recipes
-        # - The number of recipes that require self.item as well as items already in the lane
-        raise NotImplementedError
-
     def apply(self, node: Node) -> Node:
-        current_aisle = node.aisle
-        lanes_updated = deepcopy(current_aisle.lanes)
+        current_aisle = node.current_aisle
+        lanes_updated = current_aisle.lanes.copy()
         lanes_updated.add(self.item)
         aisle_updated = Aisle(
             lanes=lanes_updated,
@@ -289,26 +275,9 @@ class AddMachine(Action):
         self.recipe = recipe
         self.facility = facility
 
-    def score(self, TODO_param):
-        # TODO[functionality] Implement this
-        # It should return a positive number that correlates with the actual or dynamic significance of the recipe
-        raise NotImplementedError
-
     def apply(self, node: Node) -> Node:
-        recipe_details = node.remaining_recipes[self.recipe]
-        productivity = recipe_details.productivity
-
-        belt_contents = deepcopy(node.belt_contents)
-        for item, amount in self.recipe.ingredients.items():
-            belt_contents[item] -= amount * recipe_details.recipe_rate_per_machine
-        for item in self.recipe.outputs:
-            belt_contents[item] = (
-                belt_contents.get(item, 0)
-                + self.recipe.get_yield(item, productivity)
-                * recipe_details.recipe_rate_per_machine
-            )
-
-        remaining_recipes = deepcopy(node.remaining_recipes)
+        # Update remainig recipes
+        remaining_recipes = node.remaining_recipes.copy()
         recipe_details, requirements = remaining_recipes[self.recipe]
         requirements -= 1
         if requirements == 0:
@@ -316,16 +285,33 @@ class AddMachine(Action):
         else:
             remaining_recipes[self.recipe] = (recipe_details, requirements)
 
-        current_production = deepcopy(node.current_production)
+        # Update belt contents
+        productivity = recipe_details.productivity
+        belt_contents = node.belt_contents.copy()
+        for item, amount in self.recipe.ingredients.items():
+            if item in node.current_aisle.lanes:
+                continue
+            belt_contents[item] -= amount * recipe_details.recipe_rate_per_machine
+            if belt_contents[item] < ETA:
+                del belt_contents[item]
+        for item in self.recipe.outputs:
+            belt_contents[item] = (
+                belt_contents.get(item, 0)
+                + self.recipe.get_yield(item, productivity)
+                * recipe_details.recipe_rate_per_machine
+            )
+
+        # Update current production
+        current_production = node.current_production.copy()
         current_production[self.recipe] = (
             current_production.get(self.recipe, 0)
             + recipe_details.recipe_rate_per_machine
         )
 
-        aisle_machines = deepcopy(node.aisle.machines)
+        aisle_machines = node.current_aisle.machines.copy()
         aisle_machines.append((self.recipe, self.facility))
         aisle = Aisle(
-            lanes=node.aisle.lanes,
+            lanes=node.current_aisle.lanes,
             machines=aisle_machines,
         )
         return Node(
@@ -339,12 +325,9 @@ class AddMachine(Action):
 
 
 class TerminateAisle(Action):
-    def score(self, _):
-        return 0
-
     def apply(self, node: Node) -> Node:
         current_layout = node.layout
-        aisles_updated = deepcopy(current_layout.aisles)
+        aisles_updated = current_layout.aisles.copy()
         aisles_updated.append(node.current_aisle)
         layout_updated = Layout(
             aisles=aisles_updated,
@@ -359,39 +342,35 @@ class TerminateAisle(Action):
         )
 
 
-class Strategy(ABC):
+class ActionHeuristic(ABC):
+    def score_action(self, node: Node, action: Action):
+        if isinstance(action, AddLane):
+            return self._score_add_lane(node, action)
+        elif isinstance(action, AddMachine):
+            return self._score_add_machine(node, action)
+        elif isinstance(action, TerminateAisle):
+            return self._score_terminate(node, action)
+        raise TypeError(f"Unrecognized action type: {type(action)}")
+
     @abstractmethod
-    def get_next_action(self, node: Node):
+    def _score_add_lane(self, node: Node, action: AddLane):
+        pass
+
+    @abstractmethod
+    def _score_add_machine(self, node: Node, action: AddMachine):
+        pass
+
+    @abstractmethod
+    def _score_terminate(self, node: Node, action: TerminateAisle):
         pass
 
 
-class LayoutPlanner:
-    def __init__(
-        self, bus_items, recipes, production_planner, partition, initial_state=None
-    ):
-        # TODO[quality] this is kinda jank looking
-        # for one, this could theoretically (it won't with current inputs) break the dependencies as written
-        # A totally alternative strategy is to seed the belt with some bus items, but that opens a different can of worms
-        assignable_recipes = [
-            recipe
-            for recipe in recipes
-            if len(recipe.ingredients.keys() & bus_items) <= MAX_REACHABLE_LANES
-        ]
-        # bus ingredients, or seed the belt contents with some ingredients from the bus.
-        if not initial_state:
-            initial_state = Node.initial(
-                bus_items, assignable_recipes, production_planner
-            )
-        # Initial state for search
-        self._initial_state = initial_state
-
+class BasicHeuristic(ActionHeuristic):
+    def __init__(self, recipes, partition):
         # Precompute heuristics
 
-        # TODO[extension] Subclass this and move heuristics into subclasses to leverage
-        # polymorphism for extending heuristics
-
         # Static significance - how many items depend on a given recipe
-        linearized_recipes = linearize_recipes(assignable_recipes, reverse=True)
+        linearized_recipes = linearize_recipes(recipes, reverse=True)
         static_significance = {}
         for recipe in linearized_recipes:
             # Because the recipes are in reverse toposort, we can be assured
@@ -413,6 +392,47 @@ class LayoutPlanner:
 
     def get_maximal_recipe_significance(self, recipe):
         return self._static_significance[recipe]
+
+    def _score_add_lane(self, node: Node, action):
+        # TODO[functionality] Implement this
+        # It needs to know about the required recipes, the current items on belt, and the current lanes
+        # It should -1 if no recipes require self.item
+        # If recipes require self.item it should return a value that is correlated positively with:
+        # - The significance of the recipes
+        # - The number of recipes
+        # - The number of recipes that require self.item as well as items already in the lane
+        raise NotImplementedError
+
+    def _score_add_machine(self, node: Node, action):
+        # TODO[functionality] Implement this
+        # It should return a positive number that correlates with the actual or dynamic significance of the recipe
+        raise NotImplementedError
+
+    def _score_terminate(self, *_):
+        return 0
+
+
+class Strategy(ABC):
+    @abstractmethod
+    def get_actions(self, node: Node):
+        pass
+
+
+class LayoutPlanner:
+    def __init__(self, bus_items, recipes, production_planner, initial_state=None):
+        overcomplex_recipes = [
+            recipe._id
+            for recipe in recipes
+            if len(recipe.ingredients.keys() & bus_items) > MAX_REACHABLE_LANES
+        ]
+        assert (
+            len(overcomplex_recipes) == 0
+        ), f"All recipes must user no more than {MAX_REACHABLE_LANES} ingredients. The following do not: {overcomplex_recipes}"
+
+        if not initial_state:
+            initial_state = Node.initial(bus_items, recipes, production_planner)
+        # Initial state for search
+        self._initial_state = initial_state
 
     def plan_layout(self, strategy: Strategy) -> Layout:
         initial_node = self._initial_state
@@ -441,7 +461,12 @@ class BasicStrategy(Strategy):
 
 class HeuristicStrategy(BasicStrategy):
     def __init__(self, heuristic):
+        super().__init__()
         self._heuristic = heuristic
 
     def get_actions(self, node: Node) -> List[Action]:
-        return sorted(super().get_actions(node), key=self._heuristic.score)
+        return sorted(
+            super().get_actions(node),
+            key=lambda action: self._heuristic.score_action(node, action),
+            reverse=True,
+        )
