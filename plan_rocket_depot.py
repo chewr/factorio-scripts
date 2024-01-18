@@ -1,5 +1,5 @@
 from config import Config, load_parameters
-from layout import BasicHeuristic, FasterHeuristicStrategy, LayoutPlanner
+from layout import BasicHeuristic, FasterHeuristicStrategy, Layout, LayoutPlanner, Node
 from opinions import OpinionatedPartition
 from planner import ProductionPlanner
 from productivity import ProductivityPlanner  # TODO rename this guy
@@ -17,6 +17,11 @@ class RocketDepotPartition(OpinionatedPartition):
 
 
 def calculate_production(factory, conf):
+    from datetime import datetime
+    from pathlib import Path
+
+    import yaml
+
     """
     returns a production planner that knows all the recipes, how much
     of each recipe to make, what machine each recipe should be made in,
@@ -31,20 +36,33 @@ def calculate_production(factory, conf):
     plan = ProductionPlanner(
         conf.bus_inputs, conf.base_outputs, partition, module_manager
     )
-    searcher = LayoutPlanner(conf.bus_inputs.keys(), plan.recipe_rates.keys(), plan)
+    layout_fp = Path("./generated.yml")
+    if layout_fp.exists():
+        with open(layout_fp, "r") as f:
+            data = yaml.safe_load(f)
+        initial_node = Node.from_layout(
+            conf.bus_inputs,
+            plan,
+            plan.recipe_rates.keys(),
+            Layout.from_yaml(data, factory),
+        )
+        searcher = LayoutPlanner(
+            conf.bus_inputs.keys(),
+            plan.recipe_rates.keys(),
+            plan,
+            initial_state=initial_node,
+        )
+    else:
+        searcher = LayoutPlanner(conf.bus_inputs.keys(), plan.recipe_rates.keys(), plan)
     heuristic = BasicHeuristic(
         set(conf.bus_inputs.keys()), plan.recipe_rates.keys(), partition
     )
     strategy = FasterHeuristicStrategy(heuristic)
-    from datetime import datetime
 
     start = datetime.now()
     layout = searcher.plan_layout(strategy)
     duration = datetime.now() - start
-    layout_fp = "generated.yml"
     with open(layout_fp, "w") as f:
-        import yaml
-
         yaml.safe_dump(layout.to_yaml(), f)
     print(
         f"Found layout in {duration.total_seconds()} seconds. Score: {layout.get_score()}. See {layout_fp}"

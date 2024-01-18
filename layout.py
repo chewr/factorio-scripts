@@ -70,7 +70,8 @@ class Aisle:
         return cls(
             lanes={factory.items[item_id] for item_id in data["lanes"]},
             machines=[
-                (entry["recipe"], entry["machine"]) for entry in data["machines"]
+                (factory.recipes[entry["recipe"]], factory.items[entry["machine"]])
+                for entry in data.get("machines", [])
             ],
         )
 
@@ -111,7 +112,7 @@ class Layout:
 
     @classmethod
     def from_yaml(cls, data, factory):
-        return cls(aisles=[Aisle.from_yaml(aisle, factory) for aisle in data])
+        return cls(aisles=[Aisle.from_yaml(aisle, factory) for aisle in data["aisles"]])
 
     def to_yaml(self):
         return {
@@ -227,13 +228,15 @@ class Node:
                         belt_contents.get(item, 0)
                         + recipe.get_yield(item, productivity) * recipe_rate_per_machine
                     )
+        starting_layout = Layout(aisles=layout.aisles[:-1])
+        current_aisle = layout.aisles[-1]
         return cls(
-            layout=layout,
+            layout=starting_layout,
             bus_items=bus_source.keys(),
             belt_contents=belt_contents,
             current_production=current_production,
             remaining_recipes=remaining_recipes,
-            current_aisle=Aisle.empty(),
+            current_aisle=current_aisle,
         )
 
     def get_actions(self):
@@ -437,7 +440,7 @@ class BasicHeuristic(ActionHeuristic):
             [uniqueness**2 for _, uniqueness, __ in achievable_recipes.values()]
         ) / len(achievable_recipes)
         machine_weight = sum([weight for _, __, weight in achievable_recipes.values()])
-        return (0, most_significance, average_weighted_uniqueness, machine_weight)
+        return (0, most_significance, machine_weight, average_weighted_uniqueness)
 
     def _score_add_machine(self, node: Node, action: AddMachine):
         significance = self._static_significance[action.recipe]
