@@ -36,9 +36,11 @@ def calculate_production(factory, conf):
     plan = ProductionPlanner(
         conf.bus_inputs, conf.base_outputs, partition, module_manager
     )
-    layout_fp = Path("./generated.yml")
-    if layout_fp.exists():
-        with open(layout_fp, "r") as f:
+    in_layout_fp = Path("./in.yml")
+    out_layout_fp = Path("./out.yml")
+    if in_layout_fp.exists():
+        print(f"Reading from {in_layout_fp}")
+        with open(in_layout_fp, "r") as f:
             data = yaml.safe_load(f)
         initial_node = Node.from_layout(
             conf.bus_inputs,
@@ -62,10 +64,10 @@ def calculate_production(factory, conf):
     start = datetime.now()
     layout = searcher.plan_layout(strategy)
     duration = datetime.now() - start
-    with open(layout_fp, "w") as f:
+    with open(out_layout_fp, "w") as f:
         yaml.safe_dump(layout.to_yaml(), f)
     print(
-        f"Found layout in {duration.total_seconds()} seconds. Score: {layout.get_score()}. See {layout_fp}"
+        f"Found layout in {duration.total_seconds()} seconds. Score: {layout.get_score()}. See {out_layout_fp}"
     )
 
 

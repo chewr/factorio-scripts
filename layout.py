@@ -68,7 +68,8 @@ class Aisle:
 
     def to_yaml(self):
         return {
-            "lanes": [item._id for item in self.lanes],
+            "count": len(self.machines),
+            "lanes": sorted([item._id for item in self.lanes]),
             "machines": [
                 {"recipe": recipe._id, "machine": machine._id}
                 for recipe, machine in self.machines
@@ -122,6 +123,14 @@ class Aisle:
         if self.machines and not machine_actions and not lane_actions:
             # Returning an empty list is meaningful, so in order to ensure
             # convergence we only allow aisle termination if progress has been made
+            unused_lanes = self.lanes.copy()
+            for recipe, _ in self.machines:
+                unused_lanes.difference_update(recipe.ingredients.keys())
+            if unused_lanes:
+                import ipdb
+
+                ipdb.set_trace()
+                return [RemoveLanes(unused_lanes)]
             return [TerminateAisle()]
         return machine_actions + lane_actions
 
@@ -367,6 +376,33 @@ class TerminateAisle(Action):
         )
 
 
+class RemoveLanes(Action):
+    def __init__(self, lanes):
+        import ipdb
+
+        ipdb.set_trace()
+        self._lanes = lanes
+
+    def apply(self, node):
+        import ipdb
+
+        ipdb.set_trace()
+        lanes = node.current_aisle.lanes.copy()
+        lanes.difference_update(self.lanes)
+        current_aisle = Aisle(
+            lanes=lanes,
+            machines=node.current_aisle.machines,
+        )
+        return Node(
+            layout=node.layout,
+            bus_items=node.bus_items,
+            belt_contents=node.belt_contents,
+            current_production=node.current_production,
+            remaining_recipes=node.remaining_recipes,
+            current_aisle=current_aisle,
+        )
+
+
 class ActionHeuristic(ABC):
     def score_action(self, node: Node, action: Action):
         if isinstance(action, AddLane):
@@ -375,6 +411,8 @@ class ActionHeuristic(ABC):
             return self._score_add_machine(node, action)
         elif isinstance(action, TerminateAisle):
             return self._score_terminate(node, action)
+        elif isinstance(action, RemoveLanes):
+            return self._score_remove(node, action)
         raise TypeError(f"Unrecognized action type: {type(action)}")
 
     @abstractmethod
@@ -430,6 +468,8 @@ class BasicHeuristic(ActionHeuristic):
         # - The number of recipes
         # - The number of recipes that require self.item as well as items already in the lane
         achievable_recipes = {}
+        immediate_recipes = []
+        provisional_ingredients = node.current_aisle.lanes | {action.item}
         for recipe, requirements in node.remaining_recipes.items():
             if action.item not in recipe.ingredients:
                 continue
@@ -449,9 +489,11 @@ class BasicHeuristic(ActionHeuristic):
                 ):
                     achievable_recipes[recipe] = (
                         self._static_significance[recipe],
-                        len(base_ingredients),
+                        len(base_ingredients & node.current_aisle.lanes),
                         weight,
                     )
+                if base_ingredients <= provisional_ingredients:
+                    immediate_recipes.append(recipe)
         if not achievable_recipes:
             # TODO[quality] This tuple return type thing is pretty unintuitive
             # Sorted from least to greatest: [(), (-1,), (0,), (0, 9, 9, 9), (1, 1, 1), (1, 2, 3, 4, 5, 6), (45, 1, 2)]
@@ -460,11 +502,20 @@ class BasicHeuristic(ActionHeuristic):
         most_significance = max(
             [significance for significance, _, __ in achievable_recipes.values()]
         )
-        average_weighted_uniqueness = sum(
-            [uniqueness**2 for _, uniqueness, __ in achievable_recipes.values()]
+        immediate_payoff = sum(
+            [self._static_significance[recipe] for recipe in immediate_recipes]
+        )
+        average_weighted_suitability = sum(
+            [suitability**2 for _, suitability, __ in achievable_recipes.values()]
         ) / len(achievable_recipes)
         machine_weight = sum([weight for _, __, weight in achievable_recipes.values()])
-        return (0, most_significance, machine_weight, average_weighted_uniqueness)
+        return (
+            0,
+            most_significance,
+            immediate_payoff,
+            average_weighted_suitability,
+            machine_weight,
+        )
 
     def _score_add_machine(self, node: Node, action: AddMachine):
         significance = self._static_significance[action.recipe]
@@ -473,6 +524,9 @@ class BasicHeuristic(ActionHeuristic):
 
     def _score_terminate(self, *_):
         return (0,)
+
+    def _score_remove(self, _, action):
+        return (1,)
 
 
 class Strategy(ABC):

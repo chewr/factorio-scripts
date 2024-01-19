@@ -10,7 +10,7 @@ class OpinionatedPartition(Partition):
         self.recipes_to_machines = {
             r: max(
                 r.producers,  # TODO can we safely limit this to just terrestrially-produced facilities?
-                key=lambda m: (m.allows_productivity, m.modules, m.speed),
+                key=lambda m: (m.allows_productivity, m.modules, m.speed, m._id),
             )
             for r in self.recipes
         }
