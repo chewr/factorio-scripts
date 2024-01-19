@@ -36,8 +36,8 @@ def calculate_production(factory, conf):
     plan = ProductionPlanner(
         conf.bus_inputs, conf.base_outputs, partition, module_manager
     )
-    in_layout_fp = Path("./in.yml")
-    out_layout_fp = Path("./out.yml")
+    in_layout_fp = Path("./generated.yml")
+    out_layout_fp = Path("./generated.yml")
     if in_layout_fp.exists():
         print(f"Reading from {in_layout_fp}")
         with open(in_layout_fp, "r") as f:

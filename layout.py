@@ -127,9 +127,6 @@ class Aisle:
             for recipe, _ in self.machines:
                 unused_lanes.difference_update(recipe.ingredients.keys())
             if unused_lanes:
-                import ipdb
-
-                ipdb.set_trace()
                 return [RemoveLanes(unused_lanes)]
             return [TerminateAisle()]
         return machine_actions + lane_actions
@@ -378,15 +375,9 @@ class TerminateAisle(Action):
 
 class RemoveLanes(Action):
     def __init__(self, lanes):
-        import ipdb
-
-        ipdb.set_trace()
-        self._lanes = lanes
+        self.lanes = lanes
 
     def apply(self, node):
-        import ipdb
-
-        ipdb.set_trace()
         lanes = node.current_aisle.lanes.copy()
         lanes.difference_update(self.lanes)
         current_aisle = Aisle(
