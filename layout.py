@@ -15,6 +15,26 @@ MAX_REACHABLE_LANES = 6
 ETA = 1e-10
 
 
+class Meter:
+    def __init__(self):
+        self._value = 0.0
+        self._base = 0.0
+
+    def record(self, q):
+        self._base += 1.0
+        self._value += q
+
+    def mean(self):
+        return self._value / self._base
+
+    def total(self):
+        return self._value
+
+
+all_actions_meter = Meter()
+nodes_looked_at_meter = Meter()
+
+
 @dataclass(frozen=True)
 class RecipeDetails:
     recipe_rate_per_machine: float
@@ -80,7 +100,7 @@ class Aisle:
             return [TerminateAisle()]
 
         machine_actions = []
-        lane_actions = []
+        lanes_to_add = set()
         for recipe, requirements in recipe_requirements.items():
             details, _ = requirements
             base_ingredients = recipe.ingredients.keys() & bus_items
@@ -95,9 +115,9 @@ class Aisle:
                 if base_ingredients <= self.lanes:
                     machine_actions.append(AddMachine(recipe, details.machine))
                 elif len(base_ingredients | self.lanes) <= MAX_REACHABLE_LANES:
-                    lane_actions.extend(
-                        [AddLane(item) for item in base_ingredients - self.lanes]
-                    )
+                    lanes_to_add.update(base_ingredients - self.lanes)
+
+        lane_actions = [AddLane(item) for item in lanes_to_add]
 
         if self.machines and not machine_actions and not lane_actions:
             # Returning an empty list is meaningful, so in order to ensure
@@ -240,9 +260,11 @@ class Node:
         )
 
     def get_actions(self):
-        return self.current_aisle.get_actions(
+        actions = self.current_aisle.get_actions(
             self.bus_items, self.belt_contents, self.remaining_recipes
         )
+        all_actions_meter.record(len(actions))
+        return actions
 
 
 class Action(ABC):
@@ -409,6 +431,8 @@ class BasicHeuristic(ActionHeuristic):
         # - The number of recipes that require self.item as well as items already in the lane
         achievable_recipes = {}
         for recipe, requirements in node.remaining_recipes.items():
+            if action.item not in recipe.ingredients:
+                continue
             details, weight = requirements
             base_ingredients = recipe.ingredients.keys() & self._bus_items
             if all(
@@ -478,11 +502,15 @@ class LayoutPlanner:
 
         final_node = self._plan_layout_recursive(initial_node, strategy)
 
+        print(f"Nodes looked at:                    {nodes_looked_at_meter.total()}")
+        print(f"Average actions per node:           {all_actions_meter.mean()}")
+
         return final_node.get_layout()
 
     @classmethod
     def _plan_layout_recursive(cls, node: Node, strategy: Strategy):
         for action in strategy.get_actions(node):
+            nodes_looked_at_meter.record(1)
             child = action.apply(node)
             if child.is_goal_state():
                 return child
