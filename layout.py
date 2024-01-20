@@ -553,16 +553,30 @@ class LayoutPlanner:
         return final_node.get_layout()
 
     @classmethod
-    def _plan_layout_recursive(cls, node: Node, strategy: Strategy):
+    def _plan_layout_recursive(cls, node: Node, strategy: Strategy, branch=False):
+        best, best_score = None, 0
+
         for action in strategy.get_actions(node):
             nodes_looked_at_meter.record(1)
             child = action.apply(node)
             if child.is_goal_state():
-                return child
-            result = cls._plan_layout_recursive(child, strategy)
+                result = child
+            else:
+                result = cls._plan_layout_recursive(child, strategy)
             if result is not None:
-                return result
-        return None
+                score = cls._evaluate(result)
+                if score > best_score:
+                    best = result
+                    best_score = score
+
+                if not branch:
+                    break
+
+        return best
+
+    @classmethod
+    def _evaluate(cls, node):
+        return node.layout.get_score()
 
 
 class BasicStrategy(Strategy):
