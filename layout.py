@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import Dict, List, Set, Tuple
 
 from planner import linearize_recipes
-from sxp import BaseItem, BaseRecipe, FacilityItem
+from sxp import BaseItem, BaseRecipe, FacilityItem, SolidItem
 
 MACHINES_PER_BANK = 26
 SUSHI_BELT_WIDTH = 3
@@ -13,6 +13,8 @@ INSERTER_SPACES = 2
 LANE_WIDTH = 0.5
 MAX_REACHABLE_LANES = 6
 ETA = 1e-10
+EXPRESS_BELT_LANE_RATE = 22.5
+PIPE_RATE = 600
 
 
 class Meter:
@@ -56,14 +58,18 @@ class RecipeDetails:
 class Aisle:
     # TODO[optimization] this doesn't handle having >6 lanes (separate items reachable for top machiens and bottom mochines
     # TODO[extension] we're also not currently handling per-lane throughput or keeping track of lane exhaustion
-    lanes: Set[BaseItem]
+    lanes: List[BaseItem]
+    lane_contents: Dict[BaseItem, float]
     machines: List[Tuple[BaseRecipe, FacilityItem]]
+    max_allowed_lanes: int
 
     @classmethod
     def empty(cls):
         return cls(
-            lanes=set(),
+            lanes=[],
+            lane_contents={},
             machines=[],
+            max_allowed_lanes=MAX_REACHABLE_LANES,
         )
 
     def to_yaml(self):
@@ -88,46 +94,69 @@ class Aisle:
 
     @classmethod
     def from_yaml(cls, data, factory):
+        # TODO[functionality] calculate lanes properly, but we'll need to change the signature first
+        # so that we know production statistics
+        lanes = [factory.items[item_id] for item_id in data.get("lanes", [])]
+        lane_contents = {}
+        for lane in lanes:
+            item_rate = (
+                EXPRESS_BELT_LANE_RATE if isinstance(lane, SolidItem) else PIPE_RATE / 2
+            )
+            lane_contents[lane] = lane_contents.get(lane, 0) + item_rate
+        max_allowed_lanes = data.get("max-lanes", MAX_REACHABLE_LANES)
         return cls(
-            lanes={factory.items[item_id] for item_id in data["lanes"]},
+            lanes=lanes,
+            lane_contents=lane_contents,
             machines=[
                 (factory.recipes[entry["recipe"]], factory.items[entry["machine"]])
                 for entry in data.get("machines", [])
             ],
+            max_allowed_lanes=max_allowed_lanes,
         )
 
     def get_actions(self, bus_items, belt_contents, recipe_requirements):
         if len(self.machines) >= 2 * MACHINES_PER_BANK:
             return [TerminateAisle()]
 
+        available_items = belt_contents.copy()
+        available_items.update(self.lane_contents)
         machine_actions = []
         lanes_to_add = set()
         for recipe, requirements in recipe_requirements.items():
             details, _ = requirements
-            base_ingredients = recipe.ingredients.keys() & bus_items
-            if all(
-                [
-                    belt_contents.get(ingredient, 0)
-                    > details.recipe_rate_per_machine * required - ETA
-                    for ingredient, required in recipe.ingredients.items()
-                    if ingredient not in bus_items
-                ]
+            item_inputs = {
+                ingredient: amount_required * details.recipe_rate_per_machine
+                for ingredient, amount_required in recipe.ingredients.items()
+            }
+            missing_inputs = {
+                ingredient
+                for ingredient, required_rate in item_inputs.items()
+                if required_rate > available_items.get(ingredient, 0) + ETA
+            }
+            if not missing_inputs:
+                machine_actions.append(AddMachine(recipe, details.machine))
+            elif (
+                missing_inputs <= bus_items
+                and len(missing_inputs) + len(self.lanes) <= self.max_allowed_lanes
             ):
-                if base_ingredients <= self.lanes:
-                    machine_actions.append(AddMachine(recipe, details.machine))
-                elif len(base_ingredients | self.lanes) <= MAX_REACHABLE_LANES:
-                    lanes_to_add.update(base_ingredients - self.lanes)
+                lanes_to_add.update(missing_inputs)
 
         lane_actions = [AddLane(item) for item in lanes_to_add]
 
         if self.machines and not machine_actions and not lane_actions:
             # Returning an empty list is meaningful, so in order to ensure
             # convergence we only allow aisle termination if progress has been made
-            unused_lanes = self.lanes.copy()
-            for recipe, _ in self.machines:
-                unused_lanes.difference_update(recipe.ingredients.keys())
-            if unused_lanes:
-                return [RemoveLanes(unused_lanes)]
+            lanes_to_remove = []
+            for item, surplus_rate in self.lane_contents.items():
+                item_rate = (
+                    EXPRESS_BELT_LANE_RATE
+                    if isinstance(item, SolidItem)
+                    else PIPE_RATE / 2
+                )
+                unused_lanes = math.floor(surplus_rate / item_rate)
+                lanes_to_remove.extend(unused_lanes * [item])
+            if lanes_to_remove:
+                return [RemoveLanes(lanes_to_remove)]
             return [TerminateAisle()]
         return machine_actions + lane_actions
 
@@ -285,11 +314,20 @@ class AddLane(Action):
 
     def apply(self, node: Node) -> Node:
         current_aisle = node.current_aisle
-        lanes_updated = current_aisle.lanes.copy()
-        lanes_updated.add(self.item)
-        aisle_updated = Aisle(
-            lanes=lanes_updated,
+        lanes = current_aisle.lanes.copy()
+        lanes.append(self.item)
+        lane_contents = current_aisle.lane_contents.copy()
+        item_rate = (
+            EXPRESS_BELT_LANE_RATE
+            if isinstance(self.item, SolidItem)
+            else PIPE_RATE / 2
+        )
+        lane_contents[self.item] = lane_contents.get(self.item, 0) + item_rate
+        aisle = Aisle(
+            lanes=lanes,
+            lane_contents=lane_contents,
             machines=current_aisle.machines,
+            max_allowed_lanes=current_aisle.max_allowed_lanes,
         )
         return Node(
             layout=node.layout,
@@ -297,7 +335,7 @@ class AddLane(Action):
             belt_contents=node.belt_contents,
             current_production=node.current_production,
             remaining_recipes=node.remaining_recipes,
-            current_aisle=aisle_updated,
+            current_aisle=aisle,
         )
 
 
@@ -319,12 +357,17 @@ class AddMachine(Action):
         # Update belt contents
         productivity = recipe_details.productivity
         belt_contents = node.belt_contents.copy()
+        lane_contents = node.current_aisle.lane_contents.copy()
         for item, amount in self.recipe.ingredients.items():
-            if item in node.current_aisle.lanes:
-                continue
-            belt_contents[item] -= amount * recipe_details.recipe_rate_per_machine
-            if belt_contents[item] < ETA:
-                del belt_contents[item]
+            consumption_rate = amount * recipe_details.recipe_rate_per_machine
+            if lane_contents.get(item, 0) > consumption_rate - ETA:
+                lane_contents[item] -= consumption_rate
+            elif belt_contents.get(item, 0) > consumption_rate - ETA:
+                belt_contents[item] -= consumption_rate
+                if belt_contents[item] < ETA:
+                    del belt_contents[item]
+            else:
+                raise RuntimeError(f"Unschedulable recipe: {self.recipe}")
         for item in self.recipe.outputs:
             belt_contents[item] = (
                 belt_contents.get(item, 0)
@@ -343,7 +386,9 @@ class AddMachine(Action):
         aisle_machines.append((self.recipe, self.facility))
         aisle = Aisle(
             lanes=node.current_aisle.lanes,
+            lane_contents=lane_contents,
             machines=aisle_machines,
+            max_allowed_lanes=node.current_aisle.max_allowed_lanes,
         )
         return Node(
             layout=node.layout,
@@ -375,14 +420,26 @@ class TerminateAisle(Action):
 
 class RemoveLanes(Action):
     def __init__(self, lanes):
-        self.lanes = lanes
+        self.remove_lanes = lanes
 
     def apply(self, node):
         lanes = node.current_aisle.lanes.copy()
-        lanes.difference_update(self.lanes)
+        lane_contents = node.current_aisle.lane_contents.copy()
+        for lane in self.remove_lanes:
+            lanes.remove(lane)
+
+            item_rate = (
+                EXPRESS_BELT_LANE_RATE if isinstance(lane, SolidItem) else PIPE_RATE / 2
+            )
+            lane_contents[lane] -= item_rate
+            if lane_contents[lane] < ETA:
+                del lane_contents[lane]
+
         current_aisle = Aisle(
             lanes=lanes,
+            lane_contents=lane_contents,
             machines=node.current_aisle.machines,
+            max_allowed_lanes=node.current_aisle.max_allowed_lanes,
         )
         return Node(
             layout=node.layout,
@@ -460,7 +517,7 @@ class BasicHeuristic(ActionHeuristic):
         # - The number of recipes that require self.item as well as items already in the lane
         achievable_recipes = {}
         immediate_recipes = []
-        provisional_ingredients = node.current_aisle.lanes | {action.item}
+        provisional_ingredients = set(node.current_aisle.lanes) | {action.item}
         for recipe, requirements in node.remaining_recipes.items():
             if action.item not in recipe.ingredients:
                 continue
@@ -475,12 +532,12 @@ class BasicHeuristic(ActionHeuristic):
                 ]
             ):
                 if (
-                    len(base_ingredients | node.current_aisle.lanes)
-                    <= MAX_REACHABLE_LANES
+                    len(base_ingredients | set(node.current_aisle.lanes))
+                    <= node.current_aisle.max_allowed_lanes
                 ):
                     achievable_recipes[recipe] = (
                         self._static_significance[recipe],
-                        len(base_ingredients & node.current_aisle.lanes),
+                        len(base_ingredients & set(node.current_aisle.lanes)),
                         weight,
                     )
                 if base_ingredients <= provisional_ingredients:
