@@ -15,6 +15,8 @@ MAX_REACHABLE_LANES = 6
 ETA = 1e-10
 EXPRESS_BELT_LANE_RATE = 22.5
 PIPE_RATE = 600
+EXPRESS_BELT = "express-belt"
+INSERTER_TRAIN = "inserter-train"
 
 
 class Meter:
@@ -62,6 +64,21 @@ class Aisle:
     lane_contents: Dict[BaseItem, float]
     machines: List[Tuple[BaseRecipe, FacilityItem]]
     max_allowed_lanes: int
+    input_type: str
+
+    def get_input_rate(self, item):
+        return self._get_input_rate(item, input_type=self.input_type)
+
+    @classmethod
+    def _get_input_rate(cls, item, input_type=EXPRESS_BELT):
+        allow_fluids, solid_item_rate = {
+            EXPRESS_BELT: (True, EXPRESS_BELT_LANE_RATE),
+            INSERTER_TRAIN: (False, 1.384),
+        }[input_type]
+        if not allow_fluids and not isinstance(item, SolidItem):
+            return 0
+
+        return solid_item_rate if isinstance(item, SolidItem) else PIPE_RATE / 2
 
     @classmethod
     def empty(cls):
@@ -70,10 +87,11 @@ class Aisle:
             lane_contents={},
             machines=[],
             max_allowed_lanes=MAX_REACHABLE_LANES,
+            input_type=EXPRESS_BELT,
         )
 
     def to_yaml(self):
-        return {
+        data = {
             "count": len(self.machines),
             "lanes": sorted([item._id for item in self.lanes]),
             "machines": [
@@ -81,6 +99,11 @@ class Aisle:
                 for recipe, machine in self.machines
             ],
         }
+        if self.max_allowed_lanes != MAX_REACHABLE_LANES:
+            data["max-lanes"] = self.max_allowed_lanes
+        if self.input_type != EXPRESS_BELT:
+            data["input-type"] = self.input_type
+        return data
 
     def get_space(self):
         banks = 1 + len(self.machines) / MACHINES_PER_BANK
@@ -93,25 +116,40 @@ class Aisle:
         )
 
     @classmethod
-    def from_yaml(cls, data, factory):
+    def from_yaml(cls, data, factory, planner):
         # TODO[functionality] calculate lanes properly, but we'll need to change the signature first
         # so that we know production statistics
+        input_type = data.get("input-type", EXPRESS_BELT)
         lanes = [factory.items[item_id] for item_id in data.get("lanes", [])]
         lane_contents = {}
         for lane in lanes:
-            item_rate = (
-                EXPRESS_BELT_LANE_RATE if isinstance(lane, SolidItem) else PIPE_RATE / 2
+            lane_contents[lane] = lane_contents.get(lane, 0) + cls._get_input_rate(
+                lane, input_type=input_type
             )
-            lane_contents[lane] = lane_contents.get(lane, 0) + item_rate
         max_allowed_lanes = data.get("max-lanes", MAX_REACHABLE_LANES)
+        machines = [
+            (factory.recipes[entry["recipe"]], factory.items[entry["machine"]])
+            for entry in data.get("machines", [])
+        ]
+        for recipe, _ in machines:
+            recipe_rate = planner.get_recipe_rate(recipe)
+            _, machines_required = planner.get_machine_requirements(recipe)
+            recipe_rate_per_machine = recipe_rate / machines_required
+            for ingredient, amount in recipe.ingredients.items():
+                if ingredient in planner._input:
+                    assert ingredient in lane_contents
+                if ingredient in lane_contents:
+                    lane_contents[ingredient] -= recipe_rate_per_machine * amount
+                    if lane_contents[ingredient] < 0:
+                        import ipdb
+
+                        ipdb.set_trace()
         return cls(
             lanes=lanes,
             lane_contents=lane_contents,
-            machines=[
-                (factory.recipes[entry["recipe"]], factory.items[entry["machine"]])
-                for entry in data.get("machines", [])
-            ],
+            machines=machines,
             max_allowed_lanes=max_allowed_lanes,
+            input_type=input_type,
         )
 
     def get_actions(self, bus_items, belt_contents, recipe_requirements):
@@ -148,12 +186,7 @@ class Aisle:
             # convergence we only allow aisle termination if progress has been made
             lanes_to_remove = []
             for item, surplus_rate in self.lane_contents.items():
-                item_rate = (
-                    EXPRESS_BELT_LANE_RATE
-                    if isinstance(item, SolidItem)
-                    else PIPE_RATE / 2
-                )
-                unused_lanes = math.floor(surplus_rate / item_rate)
+                unused_lanes = math.floor(surplus_rate / self.get_input_rate(item))
                 lanes_to_remove.extend(unused_lanes * [item])
             if lanes_to_remove:
                 return [RemoveLanes(lanes_to_remove)]
@@ -166,8 +199,12 @@ class Layout:
     aisles: List[Aisle]
 
     @classmethod
-    def from_yaml(cls, data, factory):
-        return cls(aisles=[Aisle.from_yaml(aisle, factory) for aisle in data["aisles"]])
+    def from_yaml(cls, data, factory, planner):
+        return cls(
+            aisles=[
+                Aisle.from_yaml(aisle, factory, planner) for aisle in data["aisles"]
+            ]
+        )
 
     def to_yaml(self):
         return {
@@ -317,17 +354,15 @@ class AddLane(Action):
         lanes = current_aisle.lanes.copy()
         lanes.append(self.item)
         lane_contents = current_aisle.lane_contents.copy()
-        item_rate = (
-            EXPRESS_BELT_LANE_RATE
-            if isinstance(self.item, SolidItem)
-            else PIPE_RATE / 2
-        )
-        lane_contents[self.item] = lane_contents.get(self.item, 0) + item_rate
+        lane_contents[self.item] = lane_contents.get(
+            self.item, 0
+        ) + current_aisle.get_input_rate(self.item)
         aisle = Aisle(
             lanes=lanes,
             lane_contents=lane_contents,
             machines=current_aisle.machines,
             max_allowed_lanes=current_aisle.max_allowed_lanes,
+            input_type=current_aisle.input_type,
         )
         return Node(
             layout=node.layout,
@@ -389,6 +424,7 @@ class AddMachine(Action):
             lane_contents=lane_contents,
             machines=aisle_machines,
             max_allowed_lanes=node.current_aisle.max_allowed_lanes,
+            input_type=node.current_aisle.input_type,
         )
         return Node(
             layout=node.layout,
@@ -428,10 +464,7 @@ class RemoveLanes(Action):
         for lane in self.remove_lanes:
             lanes.remove(lane)
 
-            item_rate = (
-                EXPRESS_BELT_LANE_RATE if isinstance(lane, SolidItem) else PIPE_RATE / 2
-            )
-            lane_contents[lane] -= item_rate
+            lane_contents[lane] -= node.current_aisle.get_input_rate(lane)
             if lane_contents[lane] < ETA:
                 del lane_contents[lane]
 
@@ -440,6 +473,7 @@ class RemoveLanes(Action):
             lane_contents=lane_contents,
             machines=node.current_aisle.machines,
             max_allowed_lanes=node.current_aisle.max_allowed_lanes,
+            input_type=node.current_aisle.input_type,
         )
         return Node(
             layout=node.layout,

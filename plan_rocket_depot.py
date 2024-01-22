@@ -46,7 +46,7 @@ def calculate_production(factory, conf):
             conf.bus_inputs,
             plan,
             plan.recipe_rates.keys(),
-            Layout.from_yaml(data, factory),
+            Layout.from_yaml(data, factory, plan),
         )
         searcher = LayoutPlanner(
             conf.bus_inputs.keys(),
