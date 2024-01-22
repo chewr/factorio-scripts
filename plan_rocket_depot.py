@@ -65,7 +65,7 @@ def calculate_production(factory, conf):
     layout = searcher.plan_layout(strategy)
     duration = datetime.now() - start
     with open(out_layout_fp, "w") as f:
-        yaml.safe_dump(layout.to_yaml(), f)
+        yaml.safe_dump(layout.to_yaml(plan), f)
     print(
         f"Found layout in {duration.total_seconds()} seconds. Score: {layout.get_score()}. See {out_layout_fp}"
     )

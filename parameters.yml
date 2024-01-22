@@ -31,8 +31,9 @@ bus-inputs:
   refined-concrete: 2700
   rocket-control-unit: 2700
   rocket-fuel: 2700
-  se-aeroframe-pole: 2700
-  se-aeroframe-scaffold: 2700
+    # se-aeroframe-pole: 2700
+    # se-aeroframe-scaffold: 2700
+  se-cryonite-rod: 2700
   se-beryllium-plate: 2700
   se-canister: 2700
   se-heat-shielding: 2700
@@ -46,7 +47,6 @@ bus-inputs:
   steel-plate: 2700
   stone: 2700
   stone-brick: 2700
-  sulfur: 2700
   uranium-235: 2700
   uranium-238: 2700
   se-iridium-plate: 2700
@@ -55,6 +55,7 @@ base-outputs:
   se-adaptive-armour-equipment-4: 0.001
   landfill: 200
   steam-turbine: 0.375
+  se-heavy-assembly: 1
   heat-pipe: 10
   equipment-gantry: 0.5
   nuclear-fuel: 2

@@ -98,6 +98,10 @@ class Aisle:
                 {"recipe": recipe._id, "machine": machine._id}
                 for recipe, machine in self.machines
             ],
+            "lane-contents": {
+                item._id: amount_remaining
+                for item, amount_remaining in self.lane_contents.items()
+            },
         }
         if self.max_allowed_lanes != MAX_REACHABLE_LANES:
             data["max-lanes"] = self.max_allowed_lanes
@@ -109,9 +113,12 @@ class Aisle:
         banks = 1 + len(self.machines) / MACHINES_PER_BANK
         # TODO[extension] this isn't perfectly reflective of reality as there is some rearrangement that can make some
         # single-bank arrangements a bit narrower, but it's good enough for now
+        lane_width = math.ceil(len(self.lanes) * LANE_WIDTH)
+        if self.input_type == INSERTER_TRAIN:
+            lane_width = 2
         return (
             banks * (MACHINE_WIDTH + INSERTER_SPACES)
-            + math.ceil(len(self.lanes) * LANE_WIDTH)
+            + lane_width
             + 2 * SUSHI_BELT_WIDTH
         )
 
@@ -136,14 +143,10 @@ class Aisle:
             _, machines_required = planner.get_machine_requirements(recipe)
             recipe_rate_per_machine = recipe_rate / machines_required
             for ingredient, amount in recipe.ingredients.items():
-                if ingredient in planner._input:
-                    assert ingredient in lane_contents
                 if ingredient in lane_contents:
                     lane_contents[ingredient] -= recipe_rate_per_machine * amount
                     if lane_contents[ingredient] < 0:
-                        import ipdb
-
-                        ipdb.set_trace()
+                        raise ValueError(f"Recipe overdraws belt items: {recipe}")
         return cls(
             lanes=lanes,
             lane_contents=lane_contents,
@@ -206,9 +209,51 @@ class Layout:
             ]
         )
 
-    def to_yaml(self):
+    def to_yaml(self, planner):
+        input_rates = {}
+        output_rates = {}
+        for aisle in self.aisles:
+            for recipe, _ in aisle.machines:
+                recipe_rate = planner.get_recipe_rate(recipe)
+                _, machines_required = planner.get_machine_requirements(recipe)
+                recipe_rate_per_machine = recipe_rate / machines_required
+                for ingredient, amount in recipe.ingredients.items():
+                    if ingredient in aisle.lanes:
+                        continue
+                    input_rates[ingredient] = (
+                        input_rates.get(ingredient, 0)
+                        + recipe_rate_per_machine * amount
+                    )
+                for output in recipe.outputs:
+                    amount = recipe.get_yield(
+                        output, productivity=planner.get_productivity(recipe)
+                    )
+                    output_rates[output] = (
+                        output_rates.get(output, 0) + recipe_rate_per_machine * amount
+                    )
+
         return {
             "aisles": [aisle.to_yaml() for aisle in self.aisles],
+            "belt-contents": {
+                "totals": {
+                    "inputs": sum(
+                        [
+                            q
+                            for itm, q in input_rates.items()
+                            if isinstance(itm, SolidItem)
+                        ]
+                    ),
+                    "outputs": sum(
+                        [
+                            q
+                            for itm, q in output_rates.items()
+                            if isinstance(itm, SolidItem)
+                        ]
+                    ),
+                },
+                "input": {item._id: q for item, q in input_rates.items()},
+                "output": {item._id: q for item, q in output_rates.items()},
+            },
         }
 
     def get_space(self):
@@ -310,7 +355,7 @@ class Node:
 
                 # Update belt contents
                 for item, consumed in recipe.ingredients.items():
-                    if item in bus_source:
+                    if item in aisle.lanes:
                         continue
                     belt_contents[item] -= consumed * recipe_rate_per_machine
                     if belt_contents[item] < ETA:
@@ -551,10 +596,12 @@ class BasicHeuristic(ActionHeuristic):
         # - The number of recipes that require self.item as well as items already in the lane
         achievable_recipes = {}
         immediate_recipes = []
+        remaining_recipes_with_this_ingredient = 0
         provisional_ingredients = set(node.current_aisle.lanes) | {action.item}
         for recipe, requirements in node.remaining_recipes.items():
             if action.item not in recipe.ingredients:
                 continue
+            remaining_recipes_with_this_ingredient += 1
             details, weight = requirements
             base_ingredients = recipe.ingredients.keys() & self._bus_items
             if all(
@@ -579,6 +626,14 @@ class BasicHeuristic(ActionHeuristic):
         if not achievable_recipes:
             return ()
 
+        never_see_me_again = (
+            1 if len(immediate_recipes) == remaining_recipes_with_this_ingredient else 0
+        )
+        probably_never_see_me_again = (
+            1
+            if len(achievable_recipes) == remaining_recipes_with_this_ingredient
+            else 0
+        )
         most_significance = max(
             [significance for significance, _, __ in achievable_recipes.values()]
         )
@@ -592,8 +647,10 @@ class BasicHeuristic(ActionHeuristic):
         return (
             1,
             1,
+            never_see_me_again,
             most_significance,
             immediate_payoff,
+            probably_never_see_me_again,
             average_weighted_suitability,
             machine_weight,
         )
