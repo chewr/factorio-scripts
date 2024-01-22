@@ -1,11 +1,11 @@
 aisles:
 - count: 52
   lanes:
-  - concrete
   - copper-plate
+  - electric-motor
   - iron-plate
-  - se-water-ice
   - steel-plate
+  - stone
   - stone-brick
   machines:
   - machine: assembling-machine-3
@@ -19,37 +19,13 @@ aisles:
   - machine: assembling-machine-3
     recipe: motor
   - machine: assembling-machine-3
+    recipe: copper-cable
+  - machine: assembling-machine-3
+    recipe: copper-cable
+  - machine: assembling-machine-3
+    recipe: copper-cable
+  - machine: assembling-machine-3
     recipe: iron-stick
-  - machine: assembling-machine-3
-    recipe: firearm-magazine
-  - machine: assembling-machine-3
-    recipe: light-armor
-  - machine: assembling-machine-3
-    recipe: iron-chest
-  - machine: assembling-machine-3
-    recipe: burner-inserter
-  - machine: assembling-machine-3
-    recipe: textplate-large-iron
-  - machine: assembling-machine-3
-    recipe: pipe-to-ground
-  - machine: assembling-machine-3
-    recipe: textplate-small-iron
-  - machine: assembling-machine-3
-    recipe: gun-turret
-  - machine: assembling-machine-3
-    recipe: copper-cable
-  - machine: assembling-machine-3
-    recipe: copper-cable
-  - machine: assembling-machine-3
-    recipe: copper-cable
-  - machine: assembling-machine-3
-    recipe: small-iron-electric-pole
-  - machine: assembling-machine-3
-    recipe: submachine-gun
-  - machine: assembling-machine-3
-    recipe: textplate-large-copper
-  - machine: assembling-machine-3
-    recipe: textplate-small-copper
   - machine: assembling-machine-3
     recipe: steel-chest
   - machine: assembling-machine-3
@@ -59,269 +35,349 @@ aisles:
   - machine: assembling-machine-3
     recipe: engine-unit
   - machine: assembling-machine-3
-    recipe: aai-strongbox
+    recipe: firearm-magazine
   - machine: assembling-machine-3
-    recipe: piercing-rounds-magazine
+    recipe: aai-strongbox
   - machine: assembling-machine-3
     recipe: storage-tank
   - machine: assembling-machine-3
-    recipe: heavy-armor
-  - machine: assembling-machine-3
-    recipe: empty-barrel
-  - machine: assembling-machine-3
-    recipe: heat-exchanger
-  - machine: assembling-machine-3
-    recipe: heat-pipe
-  - machine: assembling-machine-3
-    recipe: cargo-wagon
-  - machine: assembling-machine-3
-    recipe: fluid-wagon
-  - machine: assembling-machine-3
-    recipe: flamethrower-turret
-  - machine: assembling-machine-3
-    recipe: medium-electric-pole
-  - machine: assembling-machine-3
-    recipe: textplate-large-steel
-  - machine: assembling-machine-3
-    recipe: textplate-small-steel
-  - machine: assembling-machine-3
-    recipe: car
-  - machine: assembling-machine-3
-    recipe: ironclad
-  - machine: se-electric-boiler
-    recipe: se-melting-water-ice
-  - machine: assembling-machine-3
-    recipe: aai-warehouse
-  - machine: assembling-machine-3
-    recipe: aai-storehouse
-  - machine: assembling-machine-3
-    recipe: se-pulveriser
-  - machine: assembling-machine-3
-    recipe: big-electric-pole
-  - machine: assembling-machine-3
-    recipe: textplate-small-concrete
-  - machine: assembling-machine-3
-    recipe: hazard-concrete
-  - machine: assembling-machine-3
-    recipe: textplate-large-concrete
-  - machine: assembling-machine-3
     recipe: burner-assembling-machine
+  - machine: assembling-machine-3
+    recipe: piercing-rounds-magazine
+  - machine: assembling-machine-3
+    recipe: light-armor
+  - machine: assembling-machine-3
+    recipe: heavy-armor
   - machine: assembling-machine-3
     recipe: burner-mining-drill
   - machine: assembling-machine-3
     recipe: stone-wall
   - machine: assembling-machine-3
-    recipe: burner-lab
-- count: 23
-  lanes:
-  - electric-motor
-  - electronic-circuit
-  - low-density-structure
-  - se-aeroframe-scaffold
-  - se-beryllium-plate
-  - steel-plate
-  machines:
-  - machine: assembling-machine-3
-    recipe: se-aeroframe-bulkhead
-  - machine: assembling-machine-3
-    recipe: se-aeroframe-bulkhead
-  - machine: assembling-machine-3
-    recipe: se-aeroframe-bulkhead
-  - machine: assembling-machine-3
-    recipe: se-aeroframe-bulkhead
-  - machine: assembling-machine-3
-    recipe: effectivity-module
-  - machine: assembling-machine-3
-    recipe: effectivity-module
-  - machine: assembling-machine-3
-    recipe: defender-capsule
-  - machine: assembling-machine-3
-    recipe: decider-combinator
-  - machine: assembling-machine-3
-    recipe: constant-combinator
-  - machine: assembling-machine-3
-    recipe: green-wire
-  - machine: assembling-machine-3
-    recipe: arithmetic-combinator
-  - machine: assembling-machine-3
-    recipe: red-wire
-  - machine: assembling-machine-3
-    recipe: discharge-defense-remote
-  - machine: assembling-machine-3
     recipe: assembling-machine-1
-  - machine: assembling-machine-3
-    recipe: electric-mining-drill
-  - machine: assembling-machine-3
-    recipe: inserter
-  - machine: assembling-machine-3
-    recipe: offshore-pump
-  - machine: assembling-machine-3
-    recipe: jetpack-1
-  - machine: assembling-machine-3
-    recipe: assembling-machine-2
-  - machine: assembling-machine-3
-    recipe: pump
-  - machine: assembling-machine-3
-    recipe: pumpjack
-  - machine: assembling-machine-3
-    recipe: gate
-  - machine: assembling-machine-3
-    recipe: locomotive
-- count: 34
-  lanes:
-  - advanced-circuit
-  - battery
-  - electronic-circuit
-  - solid-fuel
-  - steel-plate
-  - stone
-  machines:
   - machine: assembling-machine-3
     recipe: stone-furnace
   - machine: assembling-machine-3
+    recipe: steel-furnace
+  - machine: assembling-machine-3
+    recipe: electric-mining-drill
+  - machine: assembling-machine-3
+    recipe: empty-barrel
+  - machine: assembling-machine-3
+    recipe: iron-chest
+  - machine: assembling-machine-3
+    recipe: burner-inserter
+  - machine: assembling-machine-3
+    recipe: steam-turbine
+  - machine: assembling-machine-3
+    recipe: pump
+  - machine: assembling-machine-3
+    recipe: burner-lab
+  - machine: assembling-machine-3
+    recipe: inserter
+  - machine: assembling-machine-3
+    recipe: small-iron-electric-pole
+  - machine: assembling-machine-3
+    recipe: se-fluid-burner-generator
+  - machine: assembling-machine-3
+    recipe: repair-pack
+  - machine: assembling-machine-3
+    recipe: heat-pipe
+  - machine: assembling-machine-3
+    recipe: pumpjack
+  - machine: assembling-machine-3
+    recipe: heat-exchanger
+  - machine: assembling-machine-3
+    recipe: fuel-processor
+  - machine: assembling-machine-3
+    recipe: cargo-wagon
+  - machine: assembling-machine-3
+    recipe: submachine-gun
+  - machine: assembling-machine-3
+    recipe: equipment-gantry
+  - machine: assembling-machine-3
+    recipe: equipment-gantry-remover
+  - machine: assembling-machine-3
+    recipe: rail
+  - machine: assembling-machine-3
+    recipe: textplate-small-stone
+  - machine: assembling-machine-3
+    recipe: textplate-large-steel
+  - machine: assembling-machine-3
+    recipe: offshore-pump
+  - machine: assembling-machine-3
+    recipe: pipe-to-ground
+  - machine: assembling-machine-3
+    recipe: flamethrower-turret
+  - machine: assembling-machine-3
+    recipe: fluid-wagon
+  - machine: assembling-machine-3
+    recipe: ironclad
+- count: 52
+  lanes:
+  - advanced-circuit
+  - coal
+  - concrete
+  - electronic-circuit
+  - iron-plate
+  - steel-plate
+  machines:
+  - machine: assembling-machine-3
+    recipe: aai-warehouse
+  - machine: assembling-machine-3
+    recipe: aai-storehouse
+  - machine: assembling-machine-3
+    recipe: grenade
+  - machine: assembling-machine-3
+    recipe: grenade
+  - machine: assembling-machine-3
+    recipe: grenade
+  - machine: assembling-machine-3
+    recipe: jetpack-1
+  - machine: assembling-machine-3
+    recipe: modular-armor
+  - machine: assembling-machine-3
+    recipe: defender-capsule
+  - machine: assembling-machine-3
+    recipe: effectivity-module
+  - machine: assembling-machine-3
+    recipe: effectivity-module
+  - machine: assembling-machine-3
+    recipe: concrete-wall
+  - machine: assembling-machine-3
     recipe: distractor-capsule
   - machine: assembling-machine-3
-    recipe: aai-strongbox-storage
+    recipe: artillery-turret
   - machine: assembling-machine-3
-    recipe: aai-strongbox-passive-provider
+    recipe: se-core-miner
+  - machine: assembling-machine-3
+    recipe: substation
+  - machine: assembling-machine-3
+    recipe: poison-capsule
+  - machine: assembling-machine-3
+    recipe: slowdown-capsule
+  - machine: assembling-machine-3
+    recipe: train-stop
+  - machine: assembling-machine-3
+    recipe: se-pulveriser
+  - machine: assembling-machine-3
+    recipe: gate
+  - machine: assembling-machine-3
+    recipe: rocket-launcher
+  - machine: assembling-machine-3
+    recipe: locomotive
+  - machine: assembling-machine-3
+    recipe: tank
+  - machine: assembling-machine-3
+    recipe: artillery-wagon
+  - machine: assembling-machine-3
+    recipe: se-meteor-point-defence-ammo
+  - machine: assembling-machine-3
+    recipe: rail-signal
+  - machine: assembling-machine-3
+    recipe: logistic-chest-requester
+  - machine: assembling-machine-3
+    recipe: logistic-chest-passive-provider
+  - machine: assembling-machine-3
+    recipe: logistic-chest-buffer
+  - machine: assembling-machine-3
+    recipe: logistic-chest-active-provider
+  - machine: assembling-machine-3
+    recipe: logistic-chest-storage
+  - machine: assembling-machine-3
+    recipe: belt-immunity-equipment
+  - machine: assembling-machine-3
+    recipe: power-switch
+  - machine: assembling-machine-3
+    recipe: programmable-speaker
+  - machine: assembling-machine-3
+    recipe: big-electric-pole
+  - machine: assembling-machine-3
+    recipe: aai-warehouse-buffer
+  - machine: assembling-machine-3
+    recipe: aai-warehouse-storage
+  - machine: assembling-machine-3
+    recipe: aai-warehouse-requester
+  - machine: assembling-machine-3
+    recipe: aai-warehouse-active-provider
+  - machine: assembling-machine-3
+    recipe: aai-warehouse-passive-provider
+  - machine: assembling-machine-3
+    recipe: night-vision-equipment
   - machine: assembling-machine-3
     recipe: aai-strongbox-requester
   - machine: assembling-machine-3
     recipe: aai-strongbox-buffer
   - machine: assembling-machine-3
+    recipe: aai-strongbox-passive-provider
+  - machine: assembling-machine-3
     recipe: aai-strongbox-active-provider
   - machine: assembling-machine-3
-    recipe: aai-warehouse-buffer
-  - machine: assembling-machine-3
-    recipe: aai-warehouse-active-provider
-  - machine: assembling-machine-3
-    recipe: aai-warehouse-requester
-  - machine: assembling-machine-3
-    recipe: aai-warehouse-passive-provider
-  - machine: assembling-machine-3
-    recipe: aai-warehouse-storage
-  - machine: assembling-machine-3
-    recipe: aai-storehouse-storage
+    recipe: aai-strongbox-storage
   - machine: assembling-machine-3
     recipe: aai-storehouse-buffer
   - machine: assembling-machine-3
     recipe: aai-storehouse-passive-provider
   - machine: assembling-machine-3
-    recipe: aai-storehouse-requester
-  - machine: assembling-machine-3
     recipe: aai-storehouse-active-provider
   - machine: assembling-machine-3
-    recipe: logistic-chest-active-provider
+    recipe: aai-storehouse-storage
   - machine: assembling-machine-3
-    recipe: logistic-chest-passive-provider
+    recipe: aai-storehouse-requester
   - machine: assembling-machine-3
-    recipe: logistic-chest-requester
-  - machine: assembling-machine-3
-    recipe: logistic-chest-storage
-  - machine: assembling-machine-3
-    recipe: logistic-chest-buffer
-  - machine: assembling-machine-3
-    recipe: modular-armor
-  - machine: assembling-machine-3
-    recipe: artillery-wagon
-  - machine: assembling-machine-3
-    recipe: night-vision-equipment
-  - machine: assembling-machine-3
-    recipe: belt-immunity-equipment
-  - machine: assembling-machine-3
-    recipe: tank
-  - machine: assembling-machine-3
-    recipe: rail
-  - machine: assembling-machine-3
-    recipe: se-adaptive-armour-equipment-1
-  - machine: assembling-machine-3
-    recipe: personal-roboport-equipment
-  - machine: assembling-machine-3
-    recipe: effectivity-module-2
-  - machine: assembling-machine-3
-    recipe: battery-equipment
-  - machine: assembling-machine-3
-    recipe: speed-module
-  - machine: assembling-machine-3
-    recipe: destroyer-capsule
-- count: 16
+    recipe: rail-chain-signal
+- count: 14
   lanes:
-  - coal
+  - copper-plate
   - heavy-oil
   - iron-plate
   - plastic-bar
-  - steel-plate
-  - stone-brick
+  - se-water-ice
   machines:
-  - machine: assembling-machine-3
-    recipe: long-handed-inserter
-  - machine: assembling-machine-3
-    recipe: grenade
-  - machine: assembling-machine-3
-    recipe: grenade
-  - machine: assembling-machine-3
-    recipe: grenade
-  - machine: chemical-plant
-    recipe: heavy-oil-cracking
+  - machine: se-electric-boiler
+    recipe: se-melting-water-ice
   - machine: chemical-plant
     recipe: lubricant
   - machine: chemical-plant
+    recipe: heavy-oil-cracking
+  - machine: chemical-plant
     recipe: light-oil-cracking
+  - machine: assembling-machine-3
+    recipe: textplate-large-plastic
+  - machine: assembling-machine-3
+    recipe: textplate-small-copper
+  - machine: assembling-machine-3
+    recipe: textplate-large-copper
   - machine: assembling-machine-3
     recipe: fill-heavy-oil-barrel
   - machine: assembling-machine-3
-    recipe: fuel-processor
-  - machine: assembling-machine-3
-    recipe: textplate-small-stone
-  - machine: assembling-machine-3
-    recipe: textplate-large-stone
-  - machine: assembling-machine-3
-    recipe: steel-furnace
-  - machine: assembling-machine-3
-    recipe: se-meteor-point-defence-ammo
+    recipe: textplate-small-plastic
   - machine: se-lifesupport-facility
     recipe: se-medpack-plastic
   - machine: assembling-machine-3
-    recipe: textplate-small-plastic
+    recipe: long-handed-inserter
   - machine: assembling-machine-3
-    recipe: textplate-large-plastic
-- count: 12
+    recipe: gun-turret
+  - machine: assembling-machine-3
+    recipe: textplate-small-iron
+  - machine: assembling-machine-3
+    recipe: textplate-large-iron
+- count: 23
   lanes:
+  - advanced-circuit
   - battery
-  - concrete
   - electric-motor
   - electronic-circuit
   - glass
   - steel-plate
   machines:
   - machine: assembling-machine-3
-    recipe: concrete-wall
+    recipe: se-adaptive-armour-equipment-1
   - machine: assembling-machine-3
-    recipe: textplate-large-glass
+    recipe: laser-turret
   - machine: assembling-machine-3
-    recipe: textplate-small-glass
+    recipe: laser-turret
   - machine: assembling-machine-3
-    recipe: steel-wall
+    recipe: laser-turret
   - machine: assembling-machine-3
-    recipe: se-core-miner
+    recipe: assembling-machine-2
   - machine: assembling-machine-3
-    recipe: productivity-module
+    recipe: personal-roboport-equipment
   - machine: assembling-machine-3
-    recipe: productivity-module
+    recipe: battery-equipment
   - machine: assembling-machine-3
-    recipe: se-meteor-point-defence
+    recipe: effectivity-module-2
   - machine: assembling-machine-3
     recipe: lab
   - machine: assembling-machine-3
-    recipe: laser-turret
+    recipe: productivity-module
   - machine: assembling-machine-3
-    recipe: laser-turret
+    recipe: productivity-module
   - machine: assembling-machine-3
-    recipe: laser-turret
-- count: 15
+    recipe: medium-electric-pole
+  - machine: assembling-machine-3
+    recipe: discharge-defense-remote
+  - machine: assembling-machine-3
+    recipe: textplate-small-steel
+  - machine: assembling-machine-3
+    recipe: textplate-large-glass
+  - machine: assembling-machine-3
+    recipe: steel-wall
+  - machine: assembling-machine-3
+    recipe: car
+  - machine: assembling-machine-3
+    recipe: green-wire
+  - machine: assembling-machine-3
+    recipe: decider-combinator
+  - machine: assembling-machine-3
+    recipe: red-wire
+  - machine: assembling-machine-3
+    recipe: arithmetic-combinator
+  - machine: assembling-machine-3
+    recipe: constant-combinator
+  - machine: assembling-machine-3
+    recipe: textplate-small-glass
+- count: 10
   lanes:
-  - advanced-circuit
+  - electronic-circuit
+  - low-density-structure
+  - se-aeroframe-scaffold
+  - se-beryllium-plate
+  - solid-fuel
+  - uranium-238
+  machines:
+  - machine: assembling-machine-3
+    recipe: se-aeroframe-bulkhead
+  - machine: assembling-machine-3
+    recipe: se-aeroframe-bulkhead
+  - machine: assembling-machine-3
+    recipe: se-aeroframe-bulkhead
+  - machine: assembling-machine-3
+    recipe: se-aeroframe-bulkhead
+  - machine: assembling-machine-3
+    recipe: speed-module
+  - machine: assembling-machine-3
+    recipe: textplate-large-uranium
+  - machine: assembling-machine-3
+    recipe: uranium-rounds-magazine
+  - machine: assembling-machine-3
+    recipe: uranium-rounds-magazine
+  - machine: assembling-machine-3
+    recipe: textplate-small-uranium
+  - machine: assembling-machine-3
+    recipe: destroyer-capsule
+- count: 10
+  lanes:
+  - concrete
+  - explosives
+  - se-aeroframe-pole
+  - se-beryllium-plate
+  - se-holmium-cable
+  - steel-plate
+  machines:
+  - machine: assembling-machine-3
+    recipe: se-addon-power-pole
+  - machine: assembling-machine-3
+    recipe: se-pylon
+  - machine: assembling-machine-3
+    recipe: cluster-grenade
+  - machine: assembling-machine-3
+    recipe: land-mine
+  - machine: assembling-machine-3
+    recipe: land-mine
+  - machine: assembling-machine-3
+    recipe: mortar-cluster-bomb
+  - machine: assembling-machine-3
+    recipe: cliff-explosives
+  - machine: assembling-machine-3
+    recipe: textplate-large-concrete
+  - machine: assembling-machine-3
+    recipe: hazard-concrete
+  - machine: assembling-machine-3
+    recipe: textplate-small-concrete
+- count: 17
+  lanes:
   - electric-engine-unit
+  - glass
   - low-density-structure
   - processing-unit
   - se-heat-shielding
@@ -348,79 +404,34 @@ aisles:
   - machine: assembling-machine-3
     recipe: se-adaptive-armour-equipment-4
   - machine: assembling-machine-3
-    recipe: se-spaceship-floor
+    recipe: se-spaceship-wall
+  - machine: assembling-machine-3
+    recipe: se-condenser-turbine
+  - machine: assembling-machine-3
+    recipe: personal-laser-defense-equipment
+  - machine: assembling-machine-3
+    recipe: se-spaceship-gate
   - machine: assembling-machine-3
     recipe: se-spaceship-floor
   - machine: assembling-machine-3
     recipe: se-spaceship-floor
   - machine: assembling-machine-3
-    recipe: jetpack-2
-  - machine: assembling-machine-3
-    recipe: electric-furnace
-- count: 7
+    recipe: se-spaceship-floor
+- count: 3
   lanes:
-  - concrete
-  - explosives
-  - se-aeroframe-pole
-  - se-beryllium-plate
-  - se-holmium-cable
+  - advanced-circuit
+  - electric-engine-unit
+  - electric-motor
+  - low-density-structure
+  - se-heat-shielding
   - steel-plate
   machines:
   - machine: assembling-machine-3
-    recipe: se-pylon
+    recipe: speed-module-2
   - machine: assembling-machine-3
-    recipe: se-addon-power-pole
+    recipe: electric-furnace
   - machine: assembling-machine-3
-    recipe: cliff-explosives
-  - machine: assembling-machine-3
-    recipe: cluster-grenade
-  - machine: assembling-machine-3
-    recipe: mortar-cluster-bomb
-  - machine: assembling-machine-3
-    recipe: land-mine
-  - machine: assembling-machine-3
-    recipe: land-mine
-- count: 16
-  lanes:
-  - electric-motor
-  - electronic-circuit
-  - explosives
-  - iron-plate
-  - uranium-235
-  - uranium-238
-  machines:
-  - machine: assembling-machine-3
-    recipe: textplate-large-uranium
-  - machine: assembling-machine-3
-    recipe: textplate-small-uranium
-  - machine: assembling-machine-3
-    recipe: uranium-rounds-magazine
-  - machine: assembling-machine-3
-    recipe: uranium-rounds-magazine
-  - machine: assembling-machine-3
-    recipe: uranium-fuel-cell
-  - machine: assembling-machine-3
-    recipe: rail-signal
-  - machine: assembling-machine-3
-    recipe: programmable-speaker
-  - machine: assembling-machine-3
-    recipe: power-switch
-  - machine: assembling-machine-3
-    recipe: rail-chain-signal
-  - machine: assembling-machine-3
-    recipe: rocket-launcher
-  - machine: assembling-machine-3
-    recipe: rocket
-  - machine: assembling-machine-3
-    recipe: rocket
-  - machine: assembling-machine-3
-    recipe: explosive-rocket
-  - machine: assembling-machine-3
-    recipe: explosive-rocket
-  - machine: assembling-machine-3
-    recipe: equipment-gantry
-  - machine: assembling-machine-3
-    recipe: equipment-gantry-remover
+    recipe: jetpack-2
 - count: 4
   lanes:
   - coal
@@ -430,98 +441,95 @@ aisles:
   - se-iridium-plate
   - sulfur
   machines:
-  - machine: assembling-machine-3
-    recipe: se-heavy-bearing
   - machine: se-lifesupport-facility
     recipe: se-lifesupport-equipment-1
+  - machine: assembling-machine-3
+    recipe: se-heavy-bearing
   - machine: assembling-machine-3
     recipe: textplate-small-gold
   - machine: assembling-machine-3
     recipe: textplate-large-gold
-- count: 3
-  lanes:
-  - advanced-circuit
-  - copper-plate
-  - electric-motor
-  - glass
-  - low-density-structure
-  - se-heat-shielding
-  machines:
-  - machine: assembling-machine-3
-    recipe: se-spaceship-wall
-  - machine: assembling-machine-3
-    recipe: steam-turbine
-  - machine: assembling-machine-3
-    recipe: speed-module-2
-- count: 7
+- count: 9
   lanes:
   - advanced-circuit
   - electronic-circuit
+  - explosives
   - fast-inserter
   - flying-robot-frame
-  - refined-concrete
-  - se-canister
+  - iron-plate
   machines:
-  - machine: assembling-machine-3
-    recipe: stack-inserter
   - machine: assembling-machine-3
     recipe: filter-inserter
   - machine: assembling-machine-3
-    recipe: stack-filter-inserter
+    recipe: stack-inserter
+  - machine: assembling-machine-3
+    recipe: rocket
+  - machine: assembling-machine-3
+    recipe: rocket
   - machine: assembling-machine-3
     recipe: construction-robot
   - machine: assembling-machine-3
     recipe: logistic-robot
+  - machine: assembling-machine-3
+    recipe: stack-filter-inserter
+  - machine: assembling-machine-3
+    recipe: explosive-rocket
+  - machine: assembling-machine-3
+    recipe: explosive-rocket
+- count: 9
+  lanes:
+  - explosive-cannon-shell
+  - glass
+  - iron-plate
+  - rocket-fuel
+  - uranium-235
+  - uranium-238
+  machines:
+  - machine: assembling-machine-3
+    recipe: uranium-fuel-cell
+  - machine: assembling-machine-3
+    recipe: explosive-uranium-cannon-shell
+  - machine: assembling-machine-3
+    recipe: explosive-uranium-cannon-shell
+  - machine: assembling-machine-3
+    recipe: explosive-uranium-cannon-shell
+  - machine: assembling-machine-3
+    recipe: explosive-uranium-cannon-shell
+  - machine: centrifuge
+    recipe: nuclear-fuel
+  - machine: centrifuge
+    recipe: nuclear-fuel
+  - machine: centrifuge
+    recipe: nuclear-fuel
+  - machine: assembling-machine-3
+    recipe: small-lamp
+- count: 6
+  lanes:
+  - electric-motor
+  - glass
+  - refined-concrete
+  - se-canister
+  - steel-plate
+  - stone-brick
+  machines:
+  - machine: assembling-machine-3
+    recipe: oil-refinery
+  - machine: assembling-machine-3
+    recipe: se-fuel-refinery
+  - machine: assembling-machine-3
+    recipe: chemical-plant
   - machine: se-lifesupport-facility
     recipe: se-medpack-2
   - machine: assembling-machine-3
     recipe: refined-hazard-concrete
-- count: 4
-  lanes:
-  - copper-plate
-  - electric-engine-unit
-  - electric-motor
-  - processing-unit
-  - se-heat-shielding
-  - steel-plate
-  machines:
   - machine: assembling-machine-3
-    recipe: se-fluid-burner-generator
-  - machine: assembling-machine-3
-    recipe: se-electric-boiler
-  - machine: assembling-machine-3
-    recipe: se-spaceship-gate
-  - machine: assembling-machine-3
-    recipe: aai-signal-receiver
-- count: 7
-  lanes:
-  - advanced-circuit
-  - concrete
-  - electric-engine-unit
-  - electric-motor
-  - se-heat-shielding
-  - steel-plate
-  machines:
-  - machine: assembling-machine-3
-    recipe: substation
-  - machine: assembling-machine-3
-    recipe: artillery-turret
-  - machine: assembling-machine-3
-    recipe: roboport
-  - machine: assembling-machine-3
-    recipe: beacon
-  - machine: assembling-machine-3
-    recipe: assembling-machine-3
-  - machine: assembling-machine-3
-    recipe: se-recycling-facility
-  - machine: assembling-machine-3
-    recipe: se-delivery-cannon
-- count: 6
+    recipe: textplate-large-stone
+- count: 5
   lanes:
   - electric-engine-unit
-  - glass
   - low-density-structure
   - processing-unit
+  - radar
   - se-aeroframe-pole
   - se-holmium-cable
   machines:
@@ -534,42 +542,84 @@ aisles:
   - machine: assembling-machine-3
     recipe: power-armor-mk2
   - machine: assembling-machine-3
-    recipe: se-condenser-turbine
-  - machine: assembling-machine-3
-    recipe: personal-laser-defense-equipment
-- count: 4
-  lanes:
-  - coal
-  - electronic-circuit
-  - glass
-  - iron-plate
-  - steel-plate
-  machines:
-  - machine: assembling-machine-3
-    recipe: poison-capsule
-  - machine: assembling-machine-3
-    recipe: slowdown-capsule
-  - machine: assembling-machine-3
-    recipe: train-stop
-  - machine: assembling-machine-3
-    recipe: small-lamp
+    recipe: artillery-targeting-remote
 - count: 4
   lanes:
   - concrete
-  - electric-engine-unit
+  - copper-plate
+  - electronic-circuit
   - processing-unit
-  - radar
-  - rocket-control-unit
+  - se-heat-shielding
   - steel-plate
   machines:
   - machine: assembling-machine-3
-    recipe: artillery-targeting-remote
+    recipe: se-electric-boiler
   - machine: assembling-machine-3
-    recipe: spidertron-remote
+    recipe: se-casting-machine
   - machine: assembling-machine-3
-    recipe: se-rocket-launch-pad
+    recipe: industrial-furnace
   - machine: assembling-machine-3
-    recipe: se-rocket-landing-pad
+    recipe: nuclear-reactor
+- count: 3
+  lanes:
+  - battery
+  - processing-unit
+  - se-aeroframe-scaffold
+  - se-heavy-girder
+  - se-holmium-cable
+  - se-holmium-solenoid
+  machines:
+  - machine: assembling-machine-3
+    recipe: se-pylon-substation
+  - machine: assembling-machine-3
+    recipe: se-pylon-construction
+  - machine: assembling-machine-3
+    recipe: se-supercharger
+- count: 5
+  lanes:
+  - advanced-circuit
+  - concrete
+  - electric-engine-unit
+  - electric-motor
+  - se-heat-shielding
+  - steel-plate
+  machines:
+  - machine: assembling-machine-3
+    recipe: roboport
+  - machine: assembling-machine-3
+    recipe: beacon
+  - machine: assembling-machine-3
+    recipe: assembling-machine-3
+  - machine: assembling-machine-3
+    recipe: se-recycling-facility
+  - machine: assembling-machine-3
+    recipe: se-delivery-cannon
+- count: 2
+  lanes:
+  - electric-engine-unit
+  - processing-unit
+  - se-aeroframe-scaffold
+  - se-heat-shielding
+  - se-heavy-girder
+  - se-holmium-cable
+  machines:
+  - machine: assembling-machine-3
+    recipe: se-spaceship-clamp
+  - machine: assembling-machine-3
+    recipe: se-space-probe-rocket-silo
+- count: 2
+  lanes:
+  - battery
+  - concrete
+  - copper-plate
+  - glass
+  - processing-unit
+  - steel-plate
+  machines:
+  - machine: assembling-machine-3
+    recipe: se-energy-beam-defence
+  - machine: assembling-machine-3
+    recipe: se-meteor-defence
 - count: 1
   lanes:
   - processing-unit
@@ -591,150 +641,72 @@ aisles:
   machines:
   - machine: assembling-machine-3
     recipe: se-delivery-cannon-weapon
-- count: 7
+- count: 2
   lanes:
-  - electric-motor
-  - explosive-cannon-shell
-  - glass
-  - steel-plate
-  - stone-brick
-  - uranium-238
-  machines:
-  - machine: assembling-machine-3
-    recipe: se-fuel-refinery
-  - machine: assembling-machine-3
-    recipe: chemical-plant
-  - machine: assembling-machine-3
-    recipe: oil-refinery
-  - machine: assembling-machine-3
-    recipe: explosive-uranium-cannon-shell
-  - machine: assembling-machine-3
-    recipe: explosive-uranium-cannon-shell
-  - machine: assembling-machine-3
-    recipe: explosive-uranium-cannon-shell
-  - machine: assembling-machine-3
-    recipe: explosive-uranium-cannon-shell
-- count: 3
-  lanes:
-  - concrete
+  - battery
   - copper-plate
   - electric-engine-unit
   - processing-unit
+  - steel-plate
+  machines:
+  - machine: assembling-machine-3
+    recipe: aai-signal-receiver
+  - machine: assembling-machine-3
+    recipe: aai-signal-sender
+- count: 3
+  lanes:
+  - concrete
+  - radar
+  - rocket-control-unit
   - se-heat-shielding
   - steel-plate
   machines:
   - machine: assembling-machine-3
-    recipe: nuclear-reactor
+    recipe: se-rocket-landing-pad
   - machine: assembling-machine-3
-    recipe: industrial-furnace
+    recipe: se-delivery-cannon-chest
   - machine: assembling-machine-3
-    recipe: centrifuge
-- count: 3
-  lanes:
-  - battery
-  - processing-unit
-  - se-aeroframe-scaffold
-  - se-heavy-girder
-  - se-holmium-cable
-  - se-holmium-solenoid
-  machines:
-  - machine: assembling-machine-3
-    recipe: se-pylon-substation
-  - machine: assembling-machine-3
-    recipe: se-pylon-construction
-  - machine: assembling-machine-3
-    recipe: se-supercharger
+    recipe: spidertron-remote
 - count: 2
   lanes:
   - concrete
+  - electric-engine-unit
+  - processing-unit
+  - radar
+  - se-heat-shielding
+  - steel-plate
+  machines:
+  - machine: assembling-machine-3
+    recipe: centrifuge
+  - machine: assembling-machine-3
+    recipe: se-rocket-launch-pad
+- count: 2
+  lanes:
+  - explosives
+  - low-density-structure
+  - se-heat-shielding
+  - se-holmium-cable
+  - se-iridium-plate
+  machines:
+  - machine: assembling-machine-3
+    recipe: se-delivery-cannon-capsule-iridium
+  - machine: assembling-machine-3
+    recipe: se-delivery-cannon-weapon-capsule
+- count: 1
+  lanes:
+  - explosives
+  - rocket-control-unit
+  - rocket-fuel
+  - uranium-235
+  machines:
+  - machine: assembling-machine-3
+    recipe: atomic-bomb
+- count: 1
+  lanes:
   - glass
   - low-density-structure
-  - radar
   - rocket-control-unit
   - se-heat-shielding
   machines:
   - machine: assembling-machine-3
     recipe: se-thruster-suit
-  - machine: assembling-machine-3
-    recipe: se-delivery-cannon-chest
-- count: 2
-  lanes:
-  - battery
-  - concrete
-  - copper-plate
-  - glass
-  - processing-unit
-  - steel-plate
-  machines:
-  - machine: assembling-machine-3
-    recipe: se-meteor-defence
-  - machine: assembling-machine-3
-    recipe: se-energy-beam-defence
-- count: 5
-  lanes:
-  - explosives
-  - rocket-control-unit
-  - rocket-fuel
-  - se-iridium-plate
-  - uranium-235
-  machines:
-  - machine: centrifuge
-    recipe: nuclear-fuel
-  - machine: centrifuge
-    recipe: nuclear-fuel
-  - machine: centrifuge
-    recipe: nuclear-fuel
-  - machine: assembling-machine-3
-    recipe: atomic-bomb
-  - machine: assembling-machine-3
-    recipe: se-delivery-cannon-capsule-iridium
-- count: 2
-  lanes:
-  - electric-engine-unit
-  - processing-unit
-  - se-aeroframe-scaffold
-  - se-heat-shielding
-  - se-heavy-girder
-  - se-holmium-cable
-  machines:
-  - machine: assembling-machine-3
-    recipe: se-spaceship-clamp
-  - machine: assembling-machine-3
-    recipe: se-space-probe-rocket-silo
-- count: 1
-  lanes:
-  - electric-engine-unit
-  - se-beryllium-plate
-  - se-holmium-cable
-  - se-holmium-solenoid
-  machines:
-  - machine: assembling-machine-3
-    recipe: se-spaceship-ion-booster-tank
-- count: 1
-  lanes:
-  - battery
-  - electric-engine-unit
-  - processing-unit
-  - steel-plate
-  machines:
-  - machine: assembling-machine-3
-    recipe: aai-signal-sender
-- count: 1
-  lanes:
-  - explosives
-  - low-density-structure
-  - se-heat-shielding
-  - se-holmium-cable
-  - se-iridium-plate
-  machines:
-  - machine: assembling-machine-3
-    recipe: se-delivery-cannon-weapon-capsule
-- count: 1
-  lanes:
-  - concrete
-  - electronic-circuit
-  - se-heat-shielding
-  - steel-plate
-  machines:
-  - machine: assembling-machine-3
-    recipe: se-casting-machine

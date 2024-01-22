@@ -1,5 +1,5 @@
 from config import Config, load_parameters
-from layout import BasicHeuristic, FasterHeuristicStrategy, Layout, LayoutPlanner, Node
+from layout import BasicHeuristic, HeuristicStrategy, Layout, LayoutPlanner, Node
 from opinions import OpinionatedPartition
 from planner import ProductionPlanner
 from productivity import ProductivityPlanner  # TODO rename this guy
@@ -59,7 +59,7 @@ def calculate_production(factory, conf):
     heuristic = BasicHeuristic(
         set(conf.bus_inputs.keys()), plan.recipe_rates.keys(), partition
     )
-    strategy = FasterHeuristicStrategy(heuristic)
+    strategy = HeuristicStrategy(heuristic)
 
     start = datetime.now()
     layout = searcher.plan_layout(strategy)

@@ -543,8 +543,6 @@ class BasicHeuristic(ActionHeuristic):
                 if base_ingredients <= provisional_ingredients:
                     immediate_recipes.append(recipe)
         if not achievable_recipes:
-            # TODO[quality] This tuple return type thing is pretty unintuitive
-            # Sorted from least to greatest: [(), (-1,), (0,), (0, 9, 9, 9), (1, 1, 1), (1, 2, 3, 4, 5, 6), (45, 1, 2)]
             return ()
 
         most_significance = max(
@@ -558,7 +556,8 @@ class BasicHeuristic(ActionHeuristic):
         ) / len(achievable_recipes)
         machine_weight = sum([weight for _, __, weight in achievable_recipes.values()])
         return (
-            0,
+            1,
+            1,
             most_significance,
             immediate_payoff,
             average_weighted_suitability,
@@ -650,29 +649,6 @@ class HeuristicStrategy(BasicStrategy):
     def get_actions(self, node: Node) -> List[Action]:
         return sorted(
             super().get_actions(node),
-            key=lambda action: self._heuristic.score_action(node, action),
-            reverse=True,
-        )
-
-
-class FasterHeuristicStrategy(Strategy):
-    def __init__(self, heuristic):
-        super().__init__()
-        self._heuristic = heuristic
-
-    def get_actions(self, node: Node) -> List[Action]:
-        actions = node.get_actions()
-        machine_actions = [
-            action for action in actions if isinstance(action, AddMachine)
-        ]
-        if machine_actions:
-            return sorted(
-                machine_actions,
-                key=lambda action: self._heuristic.score_action(node, action),
-                reverse=True,
-            )
-        return sorted(
-            actions,
             key=lambda action: self._heuristic.score_action(node, action),
             reverse=True,
         )
