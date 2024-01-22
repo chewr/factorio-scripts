@@ -7,6 +7,7 @@ from planner import linearize_recipes
 from sxp import BaseItem, BaseRecipe, FacilityItem, SolidItem
 
 MACHINES_PER_BANK = 26
+MAX_MACHINE_BANKS = 2
 SUSHI_BELT_WIDTH = 3
 MACHINE_WIDTH = 3
 INSERTER_SPACES = 2
@@ -65,6 +66,7 @@ class Aisle:
     machines: List[Tuple[BaseRecipe, FacilityItem]]
     max_allowed_lanes: int
     input_type: str
+    max_banks: int
 
     def get_input_rate(self, item):
         return self._get_input_rate(item, input_type=self.input_type)
@@ -88,6 +90,7 @@ class Aisle:
             machines=[],
             max_allowed_lanes=MAX_REACHABLE_LANES,
             input_type=EXPRESS_BELT,
+            max_banks=MAX_MACHINE_BANKS,
         )
 
     def to_yaml(self):
@@ -107,6 +110,8 @@ class Aisle:
             data["max-lanes"] = self.max_allowed_lanes
         if self.input_type != EXPRESS_BELT:
             data["input-type"] = self.input_type
+        if self.max_banks != MAX_MACHINE_BANKS:
+            data["max-banks"] = self.max_banks
         return data
 
     def get_space(self):
@@ -153,10 +158,11 @@ class Aisle:
             machines=machines,
             max_allowed_lanes=max_allowed_lanes,
             input_type=input_type,
+            max_banks=data.get("max-banks", MAX_MACHINE_BANKS),
         )
 
     def get_actions(self, bus_items, belt_contents, recipe_requirements):
-        if len(self.machines) >= 2 * MACHINES_PER_BANK:
+        if len(self.machines) >= self.max_banks * MACHINES_PER_BANK:
             return [TerminateAisle()]
 
         available_items = belt_contents.copy()
@@ -408,6 +414,7 @@ class AddLane(Action):
             machines=current_aisle.machines,
             max_allowed_lanes=current_aisle.max_allowed_lanes,
             input_type=current_aisle.input_type,
+            max_banks=current_aisle.max_banks,
         )
         return Node(
             layout=node.layout,
@@ -470,6 +477,7 @@ class AddMachine(Action):
             machines=aisle_machines,
             max_allowed_lanes=node.current_aisle.max_allowed_lanes,
             input_type=node.current_aisle.input_type,
+            max_banks=node.current_aisle.max_banks,
         )
         return Node(
             layout=node.layout,
@@ -519,6 +527,7 @@ class RemoveLanes(Action):
             machines=node.current_aisle.machines,
             max_allowed_lanes=node.current_aisle.max_allowed_lanes,
             input_type=node.current_aisle.input_type,
+            max_banks=node.current_aisle.max_banks,
         )
         return Node(
             layout=node.layout,
