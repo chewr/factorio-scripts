@@ -18,9 +18,9 @@ class ProductivityPlanner:
             )
             if use_productivity:
                 modules = machine.modules
-                productivity = 1.0 + self._productivity_module.speed * modules
+                productivity = 1.0 + self._productivity_module.productivity * modules
                 speed *= max(
-                    1.0 + self._productivity_module.productivity * modules, 0.2
+                    1.0 + self._productivity_module.speed * modules, 0.2
                 )  # TODO calculate beacon effects before applying the speed penalty cap
 
         recipes_per_second = max(

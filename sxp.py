@@ -6,7 +6,7 @@ class Resource:
         self._id = obj._id
         self.name = obj.name
 
-        self.__data = obj
+        self._data = obj
 
     def __repr__(self):
         return self._id
@@ -112,7 +112,9 @@ class FacilityItem:
             not machine.disallowedEffects
             or "productivity" not in machine.disallowedEffects
         )
-        self.modules = item.modules if hasattr(item, "modules") else 0
+        self.modules = (
+            machine.modules if hasattr(machine, "modules") and machine.modules else 0
+        )
 
         space_machine_ids = {
             "se-space-probe-rocket-silo",

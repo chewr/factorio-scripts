@@ -259,6 +259,8 @@ class Layout:
                 },
                 "input": {item._id: q for item, q in input_rates.items()},
                 "output": {item._id: q for item, q in output_rates.items()},
+                "productivity": {recipe._id: p for recipe, p in planner.productivity_by_recipe.items()},
+                "recipe-rates": {recipe._id: p for recipe, p in planner.recipe_rates.items()},
             },
         }
 
