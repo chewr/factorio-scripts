@@ -36,6 +36,9 @@ def calculate_production(factory, conf):
     plan = ProductionPlanner(
         conf.bus_inputs, conf.base_outputs, partition, module_manager
     )
+    print(
+        f"Machines required: {sum([v[1] for v in plan.machine_requirements.values()])}"
+    )
     in_layout_fp = Path("./generated.yml")
     out_layout_fp = Path("./generated.yml")
     if in_layout_fp.exists():

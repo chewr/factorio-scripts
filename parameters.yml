@@ -207,7 +207,7 @@ base-outputs:
   electric-furnace: 2
   land-mine: 100
   se-delivery-cannon: 1
-  se-delivery-cannon-capsule: 2
+    # se-delivery-cannon-capsule: 2
   laser-turret: 8
   effectivity-module: 8
   express-transport-belt: 200
@@ -225,6 +225,7 @@ base-outputs:
   tank: 0.001
   accumulator: 500
   se-space-elevator: 0.001
+  se-space-elevator-cable: 1
   aai-signal-receiver: 0.05
   se-delivery-cannon-weapon-capsule: 1
   mortar-cluster-bomb: 1

@@ -161,8 +161,11 @@ class Aisle:
             max_banks=data.get("max-banks", MAX_MACHINE_BANKS),
         )
 
+    def max_machines(self):
+        return self.max_banks * MACHINES_PER_BANK
+
     def get_actions(self, bus_items, belt_contents, recipe_requirements):
-        if len(self.machines) >= self.max_banks * MACHINES_PER_BANK:
+        if len(self.machines) >= self.max_machines():
             return [TerminateAisle()]
 
         available_items = belt_contents.copy()
@@ -259,8 +262,13 @@ class Layout:
                 },
                 "input": {item._id: q for item, q in input_rates.items()},
                 "output": {item._id: q for item, q in output_rates.items()},
-                "productivity": {recipe._id: p for recipe, p in planner.productivity_by_recipe.items()},
-                "recipe-rates": {recipe._id: p for recipe, p in planner.recipe_rates.items()},
+                "productivity": {
+                    recipe._id: p
+                    for recipe, p in planner.productivity_by_recipe.items()
+                },
+                "recipe-rates": {
+                    recipe._id: p for recipe, p in planner.recipe_rates.items()
+                },
             },
         }
 
@@ -648,8 +656,12 @@ class BasicHeuristic(ActionHeuristic):
         most_significance = max(
             [significance for significance, _, __ in achievable_recipes.values()]
         )
-        immediate_payoff = sum(
-            [self._static_significance[recipe] for recipe in immediate_recipes]
+        remaining_machine_slots = node.current_aisle.max_machines() - len(
+            node.current_aisle.machines
+        )
+        immediate_payoff = min(
+            remaining_machine_slots,
+            sum([self._static_significance[recipe] for recipe in immediate_recipes]),
         )
         average_weighted_suitability = sum(
             [suitability**2 for _, suitability, __ in achievable_recipes.values()]
