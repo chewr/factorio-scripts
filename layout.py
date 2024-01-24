@@ -782,6 +782,15 @@ class BasicHeuristic(ActionHeuristic):
         return (1,)
 
 
+# TODO[extension] New heuristic/strategy ideas
+# first idea: belted inputs should go to the recipes which need high throughput since it's easy to add inserter trains as an afterthought
+# - Mostly just prioritize things by item consumption rate
+# Second idea:
+# - Deprioritize recipes which take one or no bus inputs (lower priority than RemoveLane)
+# - Prioritize selection of recipes which reduce the total number of remaining recipes that depend on a given lane
+# - When selecting lanes, include aisle fullness as a priority with similar weight to significance (e.g. sum of significance and machines for instance)
+
+
 class Strategy(ABC):
     @abstractmethod
     def get_actions(self, node: Node):
