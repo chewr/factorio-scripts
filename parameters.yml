@@ -114,6 +114,7 @@ base-outputs:
   aai-warehouse-storage: 0.1
   textplate-small-gold: 1
   logistic-chest-passive-provider: 5
+  se-meteor-defence-ammo: 2
   construction-robot: 10
   cargo-wagon: 1
   gate: 1

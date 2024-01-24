@@ -16,7 +16,7 @@ class RocketDepotPartition(OpinionatedPartition):
         return not recipe.is_space_only()
 
 
-def calculate_production(factory, conf):
+def calculate_production(filepath, factory, conf):
     from datetime import datetime
     from pathlib import Path
 
@@ -39,8 +39,8 @@ def calculate_production(factory, conf):
     print(
         f"Machines required: {sum([v[1] for v in plan.machine_requirements.values()])}"
     )
-    in_layout_fp = Path("./generated.yml")
-    out_layout_fp = Path("./generated.yml")
+    in_layout_fp = Path(filepath)
+    out_layout_fp = Path(filepath)
     if in_layout_fp.exists():
         print(f"Reading from {in_layout_fp}")
         with open(in_layout_fp, "r") as f:
@@ -89,12 +89,12 @@ def create_sushi_layout(
     pass
 
 
-def main(factory_data_file, *args):
+def main(factory_data_file, outfile, *args):
     factory = Factory.from_file(factory_data_file)
     parameters = load_parameters("parameters.yml")
     conf = Config.of(parameters, factory)
 
-    calculate_production(factory, conf)
+    calculate_production(outfile, factory, conf)
 
 
 if __name__ == "__main__":

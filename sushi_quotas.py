@@ -37,3 +37,31 @@ print(f"Required free space (spaces/s):     {sum(belted_outputs.values())}")
 print(
     f"Available free space (spaces/s):    {belt_rate - sum(recalculated_input_rates.values())}"
 )
+
+minimax_inserter_throughput = 3.46
+
+recipe_rates = {
+    factory.recipes[rid]: rate
+    for rid, rate in data["belt-contents"]["recipe-rates"].items()
+}
+recipe_productivity = {
+    factory.recipes[rid]: prod
+    for rid, prod in data["belt-contents"]["productivity"].items()
+}
+
+for recipe, rate in recipe_rates.items():
+    for ingredient, amount in recipe.ingredients.items():
+        if not isinstance(ingredient, SolidItem):
+            continue
+        if amount * rate > minimax_inserter_throughput:
+            print(
+                f"Ingredient {ingredient} for recipe {recipe} may be inserter-bottlenecked ({amount * rate})"
+            )
+    for output in recipe.outputs:
+        if not isinstance(output, SolidItem):
+            continue
+        amount = recipe.get_yield(output, productivity=recipe_productivity[recipe])
+        if amount * rate > minimax_inserter_throughput:
+            print(
+                f"Output {output} for recipe {recipe} may be inserter-bottlenecked ({amount * rate})"
+            )

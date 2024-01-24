@@ -1,12 +1,13 @@
 import math
 from abc import ABC, abstractmethod
+from collections import OrderedDict
 from dataclasses import dataclass
-from typing import Dict, List, Set, Tuple
+from typing import Dict, List, Optional, Set, Tuple
 
 from planner import linearize_recipes
 from sxp import BaseItem, BaseRecipe, FacilityItem, SolidItem
 
-MACHINES_PER_BANK = 26
+MACHINES_PER_BANK = 25
 MAX_MACHINE_BANKS = 2
 SUSHI_BELT_WIDTH = 3
 MACHINE_WIDTH = 3
@@ -62,11 +63,14 @@ class Aisle:
     # TODO[optimization] this doesn't handle having >6 lanes (separate items reachable for top machiens and bottom mochines
     # TODO[extension] we're also not currently handling per-lane throughput or keeping track of lane exhaustion
     lanes: List[BaseItem]
+    forbidden: Set[BaseItem]
+    skip_recipes: Set[BaseRecipe]
     lane_contents: Dict[BaseItem, float]
     machines: List[Tuple[BaseRecipe, FacilityItem]]
     max_allowed_lanes: int
     input_type: str
     max_banks: int
+    note: Optional[str]
 
     def get_input_rate(self, item):
         return self._get_input_rate(item, input_type=self.input_type)
@@ -82,18 +86,56 @@ class Aisle:
 
         return solid_item_rate if isinstance(item, SolidItem) else PIPE_RATE / 2
 
+    def copy(self):
+        return Aisle(
+            lanes=self.lanes,
+            forbidden=self.forbidden,
+            skip_recipes=self.skip_recipes,
+            lane_contents=self.lane_contents,
+            machines=self.machines,
+            max_allowed_lanes=self.max_allowed_lanes,
+            input_type=self.input_type,
+            max_banks=self.max_banks,
+            note=self.note,
+        )
+
+    def proto(self):
+        fresh_lane_contents = {}
+        for lane in self.lanes:
+            fresh_lane_contents[lane] = fresh_lane_contents.get(
+                lane, 0
+            ) + self._get_input_rate(lane, input_type=self.input_type)
+        return Aisle(
+            lanes=self.lanes,
+            forbidden=self.forbidden,
+            skip_recipes=self.skip_recipes,
+            max_allowed_lanes=self.max_allowed_lanes,
+            input_type=self.input_type,
+            max_banks=self.max_banks,
+            note=self.note,
+            lane_contents=fresh_lane_contents,
+            machines=[],
+        )
+
     @classmethod
     def empty(cls):
         return cls(
             lanes=[],
+            forbidden=set(),
+            skip_recipes=set(),
             lane_contents={},
             machines=[],
             max_allowed_lanes=MAX_REACHABLE_LANES,
             input_type=EXPRESS_BELT,
             max_banks=MAX_MACHINE_BANKS,
+            note=None,
         )
 
     def to_yaml(self):
+        machine_summary = OrderedDict()
+        for recipe, machine in self.machines:
+            machine_counts = machine_summary.setdefault(recipe._id, {})
+            machine_counts[machine.name] = machine_counts.get(machine.name, 0) + 1
         data = {
             "count": len(self.machines),
             "lanes": sorted([item._id for item in self.lanes]),
@@ -105,6 +147,17 @@ class Aisle:
                 item._id: amount_remaining
                 for item, amount_remaining in self.lane_contents.items()
             },
+            "summary": [
+                {
+                    rid: ",".join(
+                        [
+                            f"{count} {machine_name}"
+                            for machine_name, count in machines.items()
+                        ]
+                    )
+                }
+                for rid, machines in machine_summary.items()
+            ],
         }
         if self.max_allowed_lanes != MAX_REACHABLE_LANES:
             data["max-lanes"] = self.max_allowed_lanes
@@ -112,6 +165,12 @@ class Aisle:
             data["input-type"] = self.input_type
         if self.max_banks != MAX_MACHINE_BANKS:
             data["max-banks"] = self.max_banks
+        if self.note:
+            data["note"] = self.note
+        if self.forbidden:
+            data["forbidden"] = [item._id for item in self.forbidden]
+        if self.skip_recipes:
+            data["skip-recipes"] = [recipe._id for recipe in self.skip_recipes]
         return data
 
     def get_space(self):
@@ -159,6 +218,11 @@ class Aisle:
             max_allowed_lanes=max_allowed_lanes,
             input_type=input_type,
             max_banks=data.get("max-banks", MAX_MACHINE_BANKS),
+            note=data.get("note"),
+            forbidden={factory.items[itid] for itid in data.get("forbidden", set())},
+            skip_recipes={
+                factory.recipes[rid] for rid in data.get("skip-recipes", set())
+            },
         )
 
     def max_machines(self):
@@ -173,6 +237,10 @@ class Aisle:
         machine_actions = []
         lanes_to_add = set()
         for recipe, requirements in recipe_requirements.items():
+            if recipe in self.skip_recipes:
+                continue
+            if recipe.ingredients.keys() & self.forbidden:
+                continue
             details, _ = requirements
             item_inputs = {
                 ingredient: amount_required * details.recipe_rate_per_machine
@@ -190,7 +258,6 @@ class Aisle:
                 and len(missing_inputs) + len(self.lanes) <= self.max_allowed_lanes
             ):
                 lanes_to_add.update(missing_inputs)
-
         lane_actions = [AddLane(item) for item in lanes_to_add]
 
         if self.machines and not machine_actions and not lane_actions:
@@ -209,13 +276,19 @@ class Aisle:
 @dataclass(frozen=True)
 class Layout:
     aisles: List[Aisle]
+    staged: List[Aisle]
 
     @classmethod
     def from_yaml(cls, data, factory, planner):
         return cls(
             aisles=[
-                Aisle.from_yaml(aisle, factory, planner) for aisle in data["aisles"]
-            ]
+                Aisle.from_yaml(aisle, factory, planner)
+                for aisle in data.get("aisles", [])
+            ],
+            staged=[
+                Aisle.from_yaml(aisle, factory, planner).proto()
+                for aisle in data.get("staged", [])
+            ],
         )
 
     def to_yaml(self, planner):
@@ -241,7 +314,7 @@ class Layout:
                         output_rates.get(output, 0) + recipe_rate_per_machine * amount
                     )
 
-        return {
+        data = {
             "aisles": [aisle.to_yaml() for aisle in self.aisles],
             "belt-contents": {
                 "totals": {
@@ -271,6 +344,9 @@ class Layout:
                 },
             },
         }
+        if self.staged:
+            data["staged"] = [a.to_yaml() for a in self.staged]
+        return data
 
     def get_space(self):
         return sum([aisle.get_space() for aisle in self.aisles])
@@ -317,7 +393,7 @@ class Node:
     @classmethod
     def initial(cls, bus_items, recipes, planner):
         return cls(
-            layout=Layout(aisles=[]),
+            layout=Layout(aisles=[], staged=[]),
             bus_items=bus_items,
             belt_contents={},
             current_production={},
@@ -381,8 +457,10 @@ class Node:
                         belt_contents.get(item, 0)
                         + recipe.get_yield(item, productivity) * recipe_rate_per_machine
                     )
-        starting_layout = Layout(aisles=layout.aisles[:-1])
-        current_aisle = layout.aisles[-1]
+        current_aisle = Aisle.empty()
+        if layout.staged:
+            current_aisle = layout.staged[0]
+        starting_layout = Layout(aisles=layout.aisles, staged=layout.staged[1:])
         return cls(
             layout=starting_layout,
             bus_items=bus_source.keys(),
@@ -425,6 +503,9 @@ class AddLane(Action):
             max_allowed_lanes=current_aisle.max_allowed_lanes,
             input_type=current_aisle.input_type,
             max_banks=current_aisle.max_banks,
+            note=current_aisle.note,
+            forbidden=current_aisle.forbidden,
+            skip_recipes=current_aisle.skip_recipes,
         )
         return Node(
             layout=node.layout,
@@ -488,6 +569,9 @@ class AddMachine(Action):
             max_allowed_lanes=node.current_aisle.max_allowed_lanes,
             input_type=node.current_aisle.input_type,
             max_banks=node.current_aisle.max_banks,
+            note=node.current_aisle.note,
+            forbidden=node.current_aisle.forbidden,
+            skip_recipes=node.current_aisle.skip_recipes,
         )
         return Node(
             layout=node.layout,
@@ -504,16 +588,17 @@ class TerminateAisle(Action):
         current_layout = node.layout
         aisles_updated = current_layout.aisles.copy()
         aisles_updated.append(node.current_aisle)
-        layout_updated = Layout(
-            aisles=aisles_updated,
-        )
+        new_aisle = Aisle.empty()
+        if current_layout.staged:
+            new_aisle = current_layout.staged[0].copy()
+        layout_updated = Layout(aisles=aisles_updated, staged=current_layout.staged[1:])
         return Node(
             layout=layout_updated,
             bus_items=node.bus_items,
             belt_contents=node.belt_contents,
             current_production=node.current_production,
             remaining_recipes=node.remaining_recipes,
-            current_aisle=Aisle.empty(),
+            current_aisle=new_aisle,
         )
 
 
@@ -538,6 +623,9 @@ class RemoveLanes(Action):
             max_allowed_lanes=node.current_aisle.max_allowed_lanes,
             input_type=node.current_aisle.input_type,
             max_banks=node.current_aisle.max_banks,
+            note=node.current_aisle.note,
+            forbidden=node.current_aisle.forbidden,
+            skip_recipes=node.current_aisle.skip_recipes,
         )
         return Node(
             layout=node.layout,
@@ -618,6 +706,10 @@ class BasicHeuristic(ActionHeuristic):
         remaining_recipes_with_this_ingredient = 0
         provisional_ingredients = set(node.current_aisle.lanes) | {action.item}
         for recipe, requirements in node.remaining_recipes.items():
+            if recipe in node.current_aisle.skip_recipes:
+                continue
+            if recipe.ingredients.keys() & node.current_aisle.forbidden:
+                continue
             if action.item not in recipe.ingredients:
                 continue
             remaining_recipes_with_this_ingredient += 1
@@ -723,9 +815,7 @@ class LayoutPlanner:
         return final_node.get_layout()
 
     @classmethod
-    def _plan_layout_recursive(cls, node: Node, strategy: Strategy, branch=False):
-        best, best_score = None, 0
-
+    def _plan_layout_recursive(cls, node: Node, strategy: Strategy):
         for action in strategy.get_actions(node):
             nodes_looked_at_meter.record(1)
             child = action.apply(node)
@@ -734,15 +824,9 @@ class LayoutPlanner:
             else:
                 result = cls._plan_layout_recursive(child, strategy)
             if result is not None:
-                score = cls._evaluate(result)
-                if score > best_score:
-                    best = result
-                    best_score = score
+                return result
 
-                if not branch:
-                    break
-
-        return best
+        return None
 
     @classmethod
     def _evaluate(cls, node):
