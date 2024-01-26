@@ -12,17 +12,20 @@ with open(filepath, "r") as f:
 if "belt-contents" in data:
     del data["belt-contents"]
 
-if hard:
+if hard and "aisles" in data:
     data["staged"] = data["aisles"]
     del data["aisles"]
 
 if "staged" in data:
-    staged = data["staged"]
+    staged = data["staged"].copy()
     for aisle in staged:
+        if "count" in aisle:
+            del aisle["count"]
         if "lane-contents" in aisle:
             del aisle["lane-contents"]
         if "machines" in aisle:
             del aisle["machines"]
+    del data["staged"]
     data["staged"] = staged
 
 with open(filepath, "w") as f:
