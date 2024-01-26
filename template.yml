@@ -10,8 +10,6 @@ staged:
   note: Initial/medpacks
   skip-recipes:
   - lubricant
-  - iron-chest
-  - pipe-to-ground
   summary:
   - iron-gear-wheel: 7 Assembling machine 3
   - iron-stick: 7 Assembling machine 3
@@ -90,28 +88,28 @@ staged:
   max-lanes: 8
   note: TODO Split me
   skip-recipes:
-  - aai-warehouse-passive-provider
+  - aai-storehouse-active-provider
+  - aai-storehouse-buffer
   - aai-storehouse-passive-provider
-  - aai-warehouse-storage
-  - se-aeroframe-pole
-  - aai-warehouse-requester
-  - se-aeroframe-bulkhead
-  - aai-warehouse-buffer
+  - aai-storehouse-requester
+  - aai-storehouse-storage
+  - aai-strongbox-active-provider
+  - aai-strongbox-buffer
   - aai-strongbox-passive-provider
   - aai-strongbox-requester
-  - logistic-chest-passive-provider
-  - aai-storehouse-storage
-  - aai-storehouse-requester
-  - logistic-chest-buffer
-  - aai-strongbox-buffer
-  - aai-warehouse-active-provider
-  - logistic-chest-requester
-  - aai-strongbox-active-provider
   - aai-strongbox-storage
-  - aai-storehouse-buffer
-  - logistic-chest-storage
-  - aai-storehouse-active-provider
+  - aai-warehouse-active-provider
+  - aai-warehouse-buffer
+  - aai-warehouse-passive-provider
+  - aai-warehouse-requester
+  - aai-warehouse-storage
   - logistic-chest-active-provider
+  - logistic-chest-buffer
+  - logistic-chest-passive-provider
+  - logistic-chest-requester
+  - logistic-chest-storage
+  - se-aeroframe-bulkhead
+  - se-aeroframe-pole
   summary:
   - aai-warehouse: 1 Assembling machine 3
   - aai-storehouse: 1 Assembling machine 3
@@ -159,8 +157,8 @@ staged:
 - count: 49
   forbidden:
   - heavy-oil
-  - uranium-238
   - iron-plate
+  - uranium-238
   lanes:
   - advanced-circuit
   - electronic-circuit
@@ -168,29 +166,29 @@ staged:
   - flying-robot-frame
   - se-cryonite-rod
   skip-recipes:
-  - textplate-small-steel
-  - textplate-large-copper
-  - textplate-small-concrete
+  - destroyer-capsule
+  - discharge-defense-remote
+  - lubricant
   - refined-concrete
   - refined-hazard-concrete
-  - textplate-large-stone
-  - textplate-large-uranium
-  - textplate-large-steel
+  - se-addon-power-pole
+  - small-iron-electric-pole
+  - textplate-large-concrete
+  - textplate-large-copper
+  - textplate-large-glass
   - textplate-large-gold
   - textplate-large-iron
+  - textplate-large-steel
+  - textplate-large-stone
+  - textplate-large-uranium
+  - textplate-small-concrete
+  - textplate-small-copper
   - textplate-small-glass
-  - lubricant
+  - textplate-small-gold
+  - textplate-small-iron
+  - textplate-small-steel
   - textplate-small-stone
   - textplate-small-uranium
-  - small-iron-electric-pole
-  - destroyer-capsule
-  - textplate-large-concrete
-  - discharge-defense-remote
-  - textplate-large-glass
-  - textplate-small-copper
-  - textplate-small-iron
-  - textplate-small-gold
-  - se-addon-power-pole
   summary:
   - se-aeroframe-scaffold: 24 Assembling machine 3
   - stack-inserter: 1 Assembling machine 3
@@ -220,9 +218,9 @@ staged:
   - stack-filter-inserter: 1 Assembling machine 3
 - count: 21
   forbidden:
+  - glass
   - heavy-oil
   - se-beryllium-plate
-  - glass
   lanes:
   - advanced-circuit
   - electric-engine-unit
@@ -288,10 +286,10 @@ staged:
   note: 19 machines with iron/green circuits when including nixie tubes. Alternatively
     replace iron/electronic with holmium-cable/processing-unit
   skip-recipes:
-  - textplate-large-uranium
-  - se-lifesupport-equipment-1
-  - textplate-small-uranium
   - grenade
+  - se-lifesupport-equipment-1
+  - textplate-large-uranium
+  - textplate-small-uranium
   summary:
   - lubricant: 1 Chemical plant
   - se-heavy-bearing: 1 Assembling machine 3
@@ -314,15 +312,15 @@ staged:
   max-banks: 1
   note: +3 nixie tubes, optional merge down/extension
   skip-recipes:
+  - discharge-defense-remote
+  - gun-turret
+  - long-handed-inserter
+  - pipe-to-ground
   - se-pylon
+  - textplate-large-concrete
   - textplate-large-iron
   - textplate-small-concrete
-  - gun-turret
-  - textplate-large-concrete
   - textplate-small-iron
-  - discharge-defense-remote
-  - pipe-to-ground
-  - long-handed-inserter
   summary:
   - grenade: 3 Assembling machine 3
   - rocket: 2 Assembling machine 3
