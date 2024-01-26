@@ -192,29 +192,29 @@ staged:
   summary:
   - se-aeroframe-scaffold: 24 Assembling machine 3
   - stack-inserter: 1 Assembling machine 3
+  - logistic-robot: 1 Assembling machine 3
+  - logistic-chest-storage: 1 Assembling machine 3
+  - logistic-chest-requester: 1 Assembling machine 3
+  - logistic-chest-passive-provider: 1 Assembling machine 3
+  - logistic-chest-buffer: 1 Assembling machine 3
+  - logistic-chest-active-provider: 1 Assembling machine 3
   - filter-inserter: 1 Assembling machine 3
   - construction-robot: 1 Assembling machine 3
-  - logistic-robot: 1 Assembling machine 3
-  - logistic-chest-active-provider: 1 Assembling machine 3
-  - logistic-chest-storage: 1 Assembling machine 3
-  - logistic-chest-buffer: 1 Assembling machine 3
-  - logistic-chest-passive-provider: 1 Assembling machine 3
-  - logistic-chest-requester: 1 Assembling machine 3
+  - aai-warehouse-storage: 1 Assembling machine 3
+  - aai-warehouse-requester: 1 Assembling machine 3
+  - aai-warehouse-passive-provider: 1 Assembling machine 3
+  - aai-warehouse-buffer: 1 Assembling machine 3
+  - aai-warehouse-active-provider: 1 Assembling machine 3
+  - aai-strongbox-storage: 1 Assembling machine 3
+  - aai-strongbox-requester: 1 Assembling machine 3
+  - aai-strongbox-passive-provider: 1 Assembling machine 3
+  - aai-strongbox-buffer: 1 Assembling machine 3
+  - aai-strongbox-active-provider: 1 Assembling machine 3
+  - aai-storehouse-storage: 1 Assembling machine 3
+  - aai-storehouse-requester: 1 Assembling machine 3
   - aai-storehouse-passive-provider: 1 Assembling machine 3
   - aai-storehouse-buffer: 1 Assembling machine 3
   - aai-storehouse-active-provider: 1 Assembling machine 3
-  - aai-storehouse-storage: 1 Assembling machine 3
-  - aai-storehouse-requester: 1 Assembling machine 3
-  - aai-strongbox-requester: 1 Assembling machine 3
-  - aai-strongbox-buffer: 1 Assembling machine 3
-  - aai-strongbox-passive-provider: 1 Assembling machine 3
-  - aai-strongbox-storage: 1 Assembling machine 3
-  - aai-strongbox-active-provider: 1 Assembling machine 3
-  - aai-warehouse-active-provider: 1 Assembling machine 3
-  - aai-warehouse-buffer: 1 Assembling machine 3
-  - aai-warehouse-storage: 1 Assembling machine 3
-  - aai-warehouse-passive-provider: 1 Assembling machine 3
-  - aai-warehouse-requester: 1 Assembling machine 3
   - stack-filter-inserter: 1 Assembling machine 3
 - count: 21
   forbidden:
@@ -232,26 +232,26 @@ staged:
   note: Merge down, +space-cargo-wagon, +space-fluid-wagon, +space-locomotive, +space-train-battery-pack
   summary:
   - se-adaptive-armour-equipment-2: 1 Assembling machine 3
-  - electric-furnace: 1 Assembling machine 3
-  - jetpack-2: 1 Assembling machine 3
-  - power-armor: 1 Assembling machine 3
   - se-adaptive-armour-equipment-3: 1 Assembling machine 3
+  - power-armor: 1 Assembling machine 3
+  - jetpack-2: 1 Assembling machine 3
+  - electric-furnace: 1 Assembling machine 3
   - small-iron-electric-pole: 1 Assembling machine 3
   - se-space-assembling-machine: 1 Assembling machine 3
-  - exoskeleton-equipment: 1 Assembling machine 3
-  - power-armor-mk2: 1 Assembling machine 3
-  - area-mining-drill: 1 Assembling machine 3
   - se-adaptive-armour-equipment-4: 1 Assembling machine 3
-  - discharge-defense-equipment: 1 Assembling machine 3
-  - jetpack-3: 1 Assembling machine 3
+  - power-armor-mk2: 1 Assembling machine 3
+  - exoskeleton-equipment: 1 Assembling machine 3
+  - area-mining-drill: 1 Assembling machine 3
   - se-lifesupport-facility: 1 Assembling machine 3
   - personal-roboport-mk2-equipment: 1 Assembling machine 3
+  - jetpack-3: 1 Assembling machine 3
+  - discharge-defense-equipment: 1 Assembling machine 3
   - textplate-small-steel: 1 Assembling machine 3
-  - medium-electric-pole: 1 Assembling machine 3
   - textplate-large-steel: 1 Assembling machine 3
-  - destroyer-capsule: 1 Assembling machine 3
+  - medium-electric-pole: 1 Assembling machine 3
   - textplate-small-gold: 1 Assembling machine 3
   - textplate-large-gold: 1 Assembling machine 3
+  - destroyer-capsule: 1 Assembling machine 3
 - count: 25
   forbidden:
   - heavy-oil
@@ -267,12 +267,12 @@ staged:
   summary:
   - se-aeroframe-bulkhead: 16 Assembling machine 3
   - se-spaceship-wall: 1 Assembling machine 3
-  - personal-laser-defense-equipment: 1 Assembling machine 3
   - se-condenser-turbine: 1 Assembling machine 3
+  - personal-laser-defense-equipment: 1 Assembling machine 3
   - se-spaceship-gate: 1 Assembling machine 3
   - textplate-small-glass: 1 Assembling machine 3
-  - se-spaceship-floor: 3 Assembling machine 3
   - textplate-large-glass: 1 Assembling machine 3
+  - se-spaceship-floor: 3 Assembling machine 3
 - count: 10
   lanes:
   - electric-engine-unit
@@ -294,13 +294,13 @@ staged:
   - lubricant: 1 Chemical plant
   - se-heavy-bearing: 1 Assembling machine 3
   - se-heavy-composite: 1 Assembling machine 3
-  - se-delivery-cannon-weapon: 1 Assembling machine 3
   - se-space-probe-rocket-silo: 1 Assembling machine 3
+  - se-delivery-cannon-weapon: 1 Assembling machine 3
   - se-spaceship-clamp: 1 Assembling machine 3
   - battery-mk2-equipment: 1 Assembling machine 3
+  - se-heavy-assembly: 1 Assembling machine 3
   - se-addon-power-pole: 1 Assembling machine 3
   - fill-heavy-oil-barrel: 1 Assembling machine 3
-  - se-heavy-assembly: 1 Assembling machine 3
 - count: 22
   lanes:
   - coal
@@ -325,20 +325,20 @@ staged:
   - grenade: 3 Assembling machine 3
   - rocket: 2 Assembling machine 3
   - cluster-grenade: 1 Assembling machine 3
+  - train-stop: 1 Assembling machine 3
   - slowdown-capsule: 1 Assembling machine 3
   - se-pulveriser: 1 Assembling machine 3
-  - train-stop: 1 Assembling machine 3
   - poison-capsule: 1 Assembling machine 3
-  - rail-signal: 1 Assembling machine 3
-  - rocket-launcher: 1 Assembling machine 3
-  - mortar-cluster-bomb: 1 Assembling machine 3
   - se-meteor-point-defence-ammo: 1 Assembling machine 3
-  - land-mine: 2 Assembling machine 3
+  - rocket-launcher: 1 Assembling machine 3
+  - rail-signal: 1 Assembling machine 3
   - rail-chain-signal: 1 Assembling machine 3
   - programmable-speaker: 1 Assembling machine 3
   - power-switch: 1 Assembling machine 3
-  - cliff-explosives: 1 Assembling machine 3
+  - mortar-cluster-bomb: 1 Assembling machine 3
+  - land-mine: 2 Assembling machine 3
   - explosive-rocket: 2 Assembling machine 3
+  - cliff-explosives: 1 Assembling machine 3
 - count: 22
   lanes:
   - explosive-cannon-shell
@@ -358,13 +358,13 @@ staged:
   - nuclear-fuel: 5 Centrifuge
   - explosive-uranium-cannon-shell: 4 Assembling machine 3
   - uranium-rounds-magazine: 2 Assembling machine 3
-  - textplate-large-iron: 1 Assembling machine 3
+  - textplate-small-uranium: 1 Assembling machine 3
   - textplate-small-iron: 1 Assembling machine 3
+  - textplate-large-uranium: 1 Assembling machine 3
+  - textplate-large-iron: 1 Assembling machine 3
+  - pipe-to-ground: 1 Assembling machine 3
   - long-handed-inserter: 1 Assembling machine 3
   - gun-turret: 1 Assembling machine 3
-  - textplate-small-uranium: 1 Assembling machine 3
-  - pipe-to-ground: 1 Assembling machine 3
-  - textplate-large-uranium: 1 Assembling machine 3
 - count: 23
   input-type: inserter-train
   lanes:
@@ -396,24 +396,24 @@ staged:
   - se-rocket-launch-pad: 1 Assembling machine 3
   - se-recycling-facility: 1 Assembling machine 3
   - centrifuge: 1 Assembling machine 3
-  - aai-signal-receiver: 1 Assembling machine 3
-  - se-space-elevator: 1 Assembling machine 3
-  - se-spaceship-ion-booster-tank: 1 Assembling machine 3
-  - se-pylon-construction: 1 Assembling machine 3
   - se-supercharger: 1 Assembling machine 3
+  - se-spaceship-ion-booster-tank: 1 Assembling machine 3
+  - se-space-elevator: 1 Assembling machine 3
+  - se-pylon-construction: 1 Assembling machine 3
   - aai-signal-sender: 1 Assembling machine 3
+  - aai-signal-receiver: 1 Assembling machine 3
   - se-space-elevator-cable: 1 Assembling machine 3
   - se-pylon-substation: 1 Assembling machine 3
   - se-electric-boiler: 1 Assembling machine 3
   - se-rtg-equipment: 1 Assembling machine 3
   - artillery-targeting-remote: 1 Assembling machine 3
-  - textplate-large-copper: 1 Assembling machine 3
   - textplate-small-stone: 1 Assembling machine 3
-  - textplate-small-concrete: 1 Assembling machine 3
   - textplate-small-copper: 1 Assembling machine 3
-  - discharge-defense-remote: 1 Assembling machine 3
-  - refined-hazard-concrete: 1 Assembling machine 3
+  - textplate-small-concrete: 1 Assembling machine 3
   - textplate-large-stone: 1 Assembling machine 3
+  - textplate-large-copper: 1 Assembling machine 3
+  - refined-hazard-concrete: 1 Assembling machine 3
+  - discharge-defense-remote: 1 Assembling machine 3
 - count: 15
   input-type: inserter-train
   lanes:
@@ -438,18 +438,18 @@ staged:
   - stone-brick
   max-lanes: 20
   summary:
-  - nuclear-reactor: 1 Assembling machine 3
   - se-energy-beam-defence: 1 Assembling machine 3
   - se-meteor-defence: 1 Assembling machine 3
-  - small-lamp: 1 Assembling machine 3
+  - se-thruster-suit: 1 Assembling machine 3
+  - se-fuel-refinery: 1 Assembling machine 3
+  - se-casting-machine: 1 Assembling machine 3
+  - oil-refinery: 1 Assembling machine 3
+  - nuclear-reactor: 1 Assembling machine 3
   - industrial-furnace: 1 Assembling machine 3
+  - chemical-plant: 1 Assembling machine 3
+  - assembling-machine-3: 1 Assembling machine 3
   - se-rocket-landing-pad: 1 Assembling machine 3
   - se-delivery-cannon-chest: 1 Assembling machine 3
-  - se-casting-machine: 1 Assembling machine 3
   - se-delivery-cannon: 1 Assembling machine 3
-  - assembling-machine-3: 1 Assembling machine 3
-  - chemical-plant: 1 Assembling machine 3
-  - se-fuel-refinery: 1 Assembling machine 3
-  - oil-refinery: 1 Assembling machine 3
-  - se-thruster-suit: 1 Assembling machine 3
+  - small-lamp: 1 Assembling machine 3
   - textplate-large-concrete: 1 Assembling machine 3
