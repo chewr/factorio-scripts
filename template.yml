@@ -1,0 +1,457 @@
+staged:
+- count: 50
+  lanes:
+  - heavy-oil
+  - iron-plate
+  - plastic-bar
+  - se-beryllium-plate
+  - se-canister
+  - se-water-ice
+  note: Initial/medpacks
+  skip-recipes:
+  - lubricant
+  - iron-chest
+  - pipe-to-ground
+  summary:
+  - iron-gear-wheel: 7 Assembling machine 3
+  - iron-stick: 7 Assembling machine 3
+  - pipe: 2 Assembling machine 3
+  - motor: 2 Assembling machine 3
+  - se-aeroframe-pole: 21 Assembling machine 3
+  - se-melting-water-ice: 1 Chemical plant
+  - firearm-magazine: 1 Assembling machine 3
+  - heavy-oil-cracking: 1 Chemical plant
+  - light-armor: 1 Assembling machine 3
+  - light-oil-cracking: 1 Chemical plant
+  - burner-inserter: 1 Assembling machine 3
+  - sulfur: 1 Chemical plant
+  - se-medpack-plastic: 1 Lifesupport facility
+  - se-medpack-2: 1 Lifesupport facility
+  - textplate-large-plastic: 1 Assembling machine 3
+  - textplate-small-plastic: 1 Assembling machine 3
+- count: 47
+  forbidden:
+  - heavy-oil
+  lanes:
+  - copper-plate
+  - electric-motor
+  - iron-plate
+  - steel-plate
+  - stone
+  - stone-brick
+  skip-recipes:
+  - se-aeroframe-bulkhead
+  - se-aeroframe-pole
+  summary:
+  - copper-cable: 9 Assembling machine 3
+  - steel-chest: 1 Assembling machine 3
+  - engine-unit: 8 Assembling machine 3
+  - aai-strongbox: 1 Assembling machine 3
+  - burner-assembling-machine: 1 Assembling machine 3
+  - storage-tank: 1 Assembling machine 3
+  - piercing-rounds-magazine: 1 Assembling machine 3
+  - heavy-armor: 1 Assembling machine 3
+  - burner-mining-drill: 1 Assembling machine 3
+  - stone-wall: 1 Assembling machine 3
+  - assembling-machine-1: 1 Assembling machine 3
+  - stone-furnace: 1 Assembling machine 3
+  - steel-furnace: 1 Assembling machine 3
+  - iron-chest: 1 Assembling machine 3
+  - empty-barrel: 1 Assembling machine 3
+  - electric-mining-drill: 1 Assembling machine 3
+  - steam-turbine: 1 Assembling machine 3
+  - burner-lab: 1 Assembling machine 3
+  - pump: 1 Assembling machine 3
+  - inserter: 1 Assembling machine 3
+  - repair-pack: 1 Assembling machine 3
+  - se-fluid-burner-generator: 1 Assembling machine 3
+  - equipment-gantry: 1 Assembling machine 3
+  - equipment-gantry-remover: 1 Assembling machine 3
+  - pumpjack: 1 Assembling machine 3
+  - cargo-wagon: 1 Assembling machine 3
+  - fuel-processor: 1 Assembling machine 3
+  - submachine-gun: 1 Assembling machine 3
+  - heat-exchanger: 1 Assembling machine 3
+  - heat-pipe: 1 Assembling machine 3
+  - rail: 1 Assembling machine 3
+  - fluid-wagon: 1 Assembling machine 3
+- count: 47
+  forbidden:
+  - heavy-oil
+  lanes:
+  - advanced-circuit
+  - battery
+  - concrete
+  - electric-motor
+  - electronic-circuit
+  - glass
+  - solid-fuel
+  - steel-plate
+  max-lanes: 8
+  note: TODO Split me
+  skip-recipes:
+  - aai-warehouse-passive-provider
+  - aai-storehouse-passive-provider
+  - aai-warehouse-storage
+  - se-aeroframe-pole
+  - aai-warehouse-requester
+  - se-aeroframe-bulkhead
+  - aai-warehouse-buffer
+  - aai-strongbox-passive-provider
+  - aai-strongbox-requester
+  - logistic-chest-passive-provider
+  - aai-storehouse-storage
+  - aai-storehouse-requester
+  - logistic-chest-buffer
+  - aai-strongbox-buffer
+  - aai-warehouse-active-provider
+  - logistic-chest-requester
+  - aai-strongbox-active-provider
+  - aai-strongbox-storage
+  - aai-storehouse-buffer
+  - logistic-chest-storage
+  - aai-storehouse-active-provider
+  - logistic-chest-active-provider
+  summary:
+  - aai-warehouse: 1 Assembling machine 3
+  - aai-storehouse: 1 Assembling machine 3
+  - se-adaptive-armour-equipment-1: 1 Assembling machine 3
+  - speed-module: 1 Assembling machine 3
+  - jetpack-1: 1 Assembling machine 3
+  - laser-turret: 3 Assembling machine 3
+  - assembling-machine-2: 1 Assembling machine 3
+  - modular-armor: 1 Assembling machine 3
+  - effectivity-module: 2 Assembling machine 3
+  - defender-capsule: 1 Assembling machine 3
+  - personal-roboport-equipment: 1 Assembling machine 3
+  - effectivity-module-2: 1 Assembling machine 3
+  - speed-module-2: 1 Assembling machine 3
+  - battery-equipment: 1 Assembling machine 3
+  - concrete-wall: 1 Assembling machine 3
+  - distractor-capsule: 1 Assembling machine 3
+  - se-meteor-point-defence: 1 Assembling machine 3
+  - roboport: 1 Assembling machine 3
+  - beacon: 1 Assembling machine 3
+  - se-meteor-defence-ammo: 1 Assembling machine 3
+  - substation: 1 Assembling machine 3
+  - artillery-turret: 1 Assembling machine 3
+  - lab: 1 Assembling machine 3
+  - se-core-miner: 1 Assembling machine 3
+  - gate: 1 Assembling machine 3
+  - big-electric-pole: 1 Assembling machine 3
+  - belt-immunity-equipment: 1 Assembling machine 3
+  - tank: 1 Assembling machine 3
+  - locomotive: 1 Assembling machine 3
+  - artillery-wagon: 1 Assembling machine 3
+  - night-vision-equipment: 1 Assembling machine 3
+  - productivity-module: 2 Assembling machine 3
+  - steel-wall: 1 Assembling machine 3
+  - constant-combinator: 1 Assembling machine 3
+  - arithmetic-combinator: 1 Assembling machine 3
+  - red-wire: 1 Assembling machine 3
+  - decider-combinator: 1 Assembling machine 3
+  - green-wire: 1 Assembling machine 3
+  - car: 1 Assembling machine 3
+  - ironclad: 1 Assembling machine 3
+  - flamethrower-turret: 1 Assembling machine 3
+  - offshore-pump: 1 Assembling machine 3
+  - hazard-concrete: 1 Assembling machine 3
+- count: 49
+  forbidden:
+  - heavy-oil
+  - uranium-238
+  - iron-plate
+  lanes:
+  - advanced-circuit
+  - electronic-circuit
+  - fast-inserter
+  - flying-robot-frame
+  - se-cryonite-rod
+  skip-recipes:
+  - textplate-small-steel
+  - textplate-large-copper
+  - textplate-small-concrete
+  - refined-concrete
+  - refined-hazard-concrete
+  - textplate-large-stone
+  - textplate-large-uranium
+  - textplate-large-steel
+  - textplate-large-gold
+  - textplate-large-iron
+  - textplate-small-glass
+  - lubricant
+  - textplate-small-stone
+  - textplate-small-uranium
+  - small-iron-electric-pole
+  - destroyer-capsule
+  - textplate-large-concrete
+  - discharge-defense-remote
+  - textplate-large-glass
+  - textplate-small-copper
+  - textplate-small-iron
+  - textplate-small-gold
+  - se-addon-power-pole
+  summary:
+  - se-aeroframe-scaffold: 24 Assembling machine 3
+  - stack-inserter: 1 Assembling machine 3
+  - filter-inserter: 1 Assembling machine 3
+  - construction-robot: 1 Assembling machine 3
+  - logistic-robot: 1 Assembling machine 3
+  - logistic-chest-active-provider: 1 Assembling machine 3
+  - logistic-chest-storage: 1 Assembling machine 3
+  - logistic-chest-buffer: 1 Assembling machine 3
+  - logistic-chest-passive-provider: 1 Assembling machine 3
+  - logistic-chest-requester: 1 Assembling machine 3
+  - aai-storehouse-passive-provider: 1 Assembling machine 3
+  - aai-storehouse-buffer: 1 Assembling machine 3
+  - aai-storehouse-active-provider: 1 Assembling machine 3
+  - aai-storehouse-storage: 1 Assembling machine 3
+  - aai-storehouse-requester: 1 Assembling machine 3
+  - aai-strongbox-requester: 1 Assembling machine 3
+  - aai-strongbox-buffer: 1 Assembling machine 3
+  - aai-strongbox-passive-provider: 1 Assembling machine 3
+  - aai-strongbox-storage: 1 Assembling machine 3
+  - aai-strongbox-active-provider: 1 Assembling machine 3
+  - aai-warehouse-active-provider: 1 Assembling machine 3
+  - aai-warehouse-buffer: 1 Assembling machine 3
+  - aai-warehouse-storage: 1 Assembling machine 3
+  - aai-warehouse-passive-provider: 1 Assembling machine 3
+  - aai-warehouse-requester: 1 Assembling machine 3
+  - stack-filter-inserter: 1 Assembling machine 3
+- count: 21
+  forbidden:
+  - heavy-oil
+  - se-beryllium-plate
+  - glass
+  lanes:
+  - advanced-circuit
+  - electric-engine-unit
+  - low-density-structure
+  - processing-unit
+  - se-heat-shielding
+  - steel-plate
+  max-banks: 1
+  note: Merge down, +space-cargo-wagon, +space-fluid-wagon, +space-locomotive, +space-train-battery-pack
+  summary:
+  - se-adaptive-armour-equipment-2: 1 Assembling machine 3
+  - electric-furnace: 1 Assembling machine 3
+  - jetpack-2: 1 Assembling machine 3
+  - power-armor: 1 Assembling machine 3
+  - se-adaptive-armour-equipment-3: 1 Assembling machine 3
+  - small-iron-electric-pole: 1 Assembling machine 3
+  - se-space-assembling-machine: 1 Assembling machine 3
+  - exoskeleton-equipment: 1 Assembling machine 3
+  - power-armor-mk2: 1 Assembling machine 3
+  - area-mining-drill: 1 Assembling machine 3
+  - se-adaptive-armour-equipment-4: 1 Assembling machine 3
+  - discharge-defense-equipment: 1 Assembling machine 3
+  - jetpack-3: 1 Assembling machine 3
+  - se-lifesupport-facility: 1 Assembling machine 3
+  - personal-roboport-mk2-equipment: 1 Assembling machine 3
+  - textplate-small-steel: 1 Assembling machine 3
+  - medium-electric-pole: 1 Assembling machine 3
+  - textplate-large-steel: 1 Assembling machine 3
+  - destroyer-capsule: 1 Assembling machine 3
+  - textplate-small-gold: 1 Assembling machine 3
+  - textplate-large-gold: 1 Assembling machine 3
+- count: 25
+  forbidden:
+  - heavy-oil
+  lanes:
+  - electric-engine-unit
+  - glass
+  - low-density-structure
+  - processing-unit
+  - se-beryllium-plate
+  - se-heat-shielding
+  max-banks: 1
+  note: Merge Up; work next
+  summary:
+  - se-aeroframe-bulkhead: 16 Assembling machine 3
+  - se-spaceship-wall: 1 Assembling machine 3
+  - personal-laser-defense-equipment: 1 Assembling machine 3
+  - se-condenser-turbine: 1 Assembling machine 3
+  - se-spaceship-gate: 1 Assembling machine 3
+  - textplate-small-glass: 1 Assembling machine 3
+  - se-spaceship-floor: 3 Assembling machine 3
+  - textplate-large-glass: 1 Assembling machine 3
+- count: 10
+  lanes:
+  - electric-engine-unit
+  - heavy-oil
+  - processing-unit
+  - se-heat-shielding
+  - se-heavy-girder
+  - se-holmium-cable
+  - se-iridium-plate
+  max-lanes: 7
+  note: 19 machines with iron/green circuits when including nixie tubes. Alternatively
+    replace iron/electronic with holmium-cable/processing-unit
+  skip-recipes:
+  - textplate-large-uranium
+  - se-lifesupport-equipment-1
+  - textplate-small-uranium
+  - grenade
+  summary:
+  - lubricant: 1 Chemical plant
+  - se-heavy-bearing: 1 Assembling machine 3
+  - se-heavy-composite: 1 Assembling machine 3
+  - se-delivery-cannon-weapon: 1 Assembling machine 3
+  - se-space-probe-rocket-silo: 1 Assembling machine 3
+  - se-spaceship-clamp: 1 Assembling machine 3
+  - battery-mk2-equipment: 1 Assembling machine 3
+  - se-addon-power-pole: 1 Assembling machine 3
+  - fill-heavy-oil-barrel: 1 Assembling machine 3
+  - se-heavy-assembly: 1 Assembling machine 3
+- count: 22
+  lanes:
+  - coal
+  - concrete
+  - electronic-circuit
+  - explosives
+  - iron-plate
+  - steel-plate
+  max-banks: 1
+  note: +3 nixie tubes, optional merge down/extension
+  skip-recipes:
+  - se-pylon
+  - textplate-large-iron
+  - textplate-small-concrete
+  - gun-turret
+  - textplate-large-concrete
+  - textplate-small-iron
+  - discharge-defense-remote
+  - pipe-to-ground
+  - long-handed-inserter
+  summary:
+  - grenade: 3 Assembling machine 3
+  - rocket: 2 Assembling machine 3
+  - cluster-grenade: 1 Assembling machine 3
+  - slowdown-capsule: 1 Assembling machine 3
+  - se-pulveriser: 1 Assembling machine 3
+  - train-stop: 1 Assembling machine 3
+  - poison-capsule: 1 Assembling machine 3
+  - rail-signal: 1 Assembling machine 3
+  - rocket-launcher: 1 Assembling machine 3
+  - mortar-cluster-bomb: 1 Assembling machine 3
+  - se-meteor-point-defence-ammo: 1 Assembling machine 3
+  - land-mine: 2 Assembling machine 3
+  - rail-chain-signal: 1 Assembling machine 3
+  - programmable-speaker: 1 Assembling machine 3
+  - power-switch: 1 Assembling machine 3
+  - cliff-explosives: 1 Assembling machine 3
+  - explosive-rocket: 2 Assembling machine 3
+- count: 22
+  lanes:
+  - explosive-cannon-shell
+  - explosives
+  - iron-plate
+  - radar
+  - rocket-control-unit
+  - rocket-fuel
+  - uranium-235
+  - uranium-238
+  max-lanes: 8
+  note: '8th lane ideas: radar (1u3, 1u2), '
+  summary:
+  - uranium-fuel-cell: 2 Assembling machine 3
+  - atomic-bomb: 1 Assembling machine 3
+  - spidertron-remote: 1 Assembling machine 3
+  - nuclear-fuel: 5 Centrifuge
+  - explosive-uranium-cannon-shell: 4 Assembling machine 3
+  - uranium-rounds-magazine: 2 Assembling machine 3
+  - textplate-large-iron: 1 Assembling machine 3
+  - textplate-small-iron: 1 Assembling machine 3
+  - long-handed-inserter: 1 Assembling machine 3
+  - gun-turret: 1 Assembling machine 3
+  - textplate-small-uranium: 1 Assembling machine 3
+  - pipe-to-ground: 1 Assembling machine 3
+  - textplate-large-uranium: 1 Assembling machine 3
+- count: 23
+  input-type: inserter-train
+  lanes:
+  - advanced-circuit
+  - battery
+  - coal
+  - concrete
+  - concrete
+  - copper-plate
+  - electric-engine-unit
+  - electronic-circuit
+  - low-density-structure
+  - processing-unit
+  - radar
+  - refined-concrete
+  - refined-concrete
+  - se-beryllium-plate
+  - se-heat-shielding
+  - se-heavy-girder
+  - se-holmium-cable
+  - se-holmium-cable
+  - se-holmium-solenoid
+  - steel-plate
+  - stone-brick
+  max-lanes: 21
+  summary:
+  - se-pylon: 1 Assembling machine 3
+  - se-lifesupport-equipment-1: 1 Lifesupport facility
+  - se-rocket-launch-pad: 1 Assembling machine 3
+  - se-recycling-facility: 1 Assembling machine 3
+  - centrifuge: 1 Assembling machine 3
+  - aai-signal-receiver: 1 Assembling machine 3
+  - se-space-elevator: 1 Assembling machine 3
+  - se-spaceship-ion-booster-tank: 1 Assembling machine 3
+  - se-pylon-construction: 1 Assembling machine 3
+  - se-supercharger: 1 Assembling machine 3
+  - aai-signal-sender: 1 Assembling machine 3
+  - se-space-elevator-cable: 1 Assembling machine 3
+  - se-pylon-substation: 1 Assembling machine 3
+  - se-electric-boiler: 1 Assembling machine 3
+  - se-rtg-equipment: 1 Assembling machine 3
+  - artillery-targeting-remote: 1 Assembling machine 3
+  - textplate-large-copper: 1 Assembling machine 3
+  - textplate-small-stone: 1 Assembling machine 3
+  - textplate-small-concrete: 1 Assembling machine 3
+  - textplate-small-copper: 1 Assembling machine 3
+  - discharge-defense-remote: 1 Assembling machine 3
+  - refined-hazard-concrete: 1 Assembling machine 3
+  - textplate-large-stone: 1 Assembling machine 3
+- count: 15
+  input-type: inserter-train
+  lanes:
+  - advanced-circuit
+  - battery
+  - concrete
+  - concrete
+  - concrete
+  - copper-plate
+  - electric-engine-unit
+  - electric-motor
+  - electronic-circuit
+  - glass
+  - iron-plate
+  - low-density-structure
+  - processing-unit
+  - radar
+  - rocket-control-unit
+  - se-heat-shielding
+  - steel-plate
+  - steel-plate
+  - stone-brick
+  max-lanes: 20
+  summary:
+  - nuclear-reactor: 1 Assembling machine 3
+  - se-energy-beam-defence: 1 Assembling machine 3
+  - se-meteor-defence: 1 Assembling machine 3
+  - small-lamp: 1 Assembling machine 3
+  - industrial-furnace: 1 Assembling machine 3
+  - se-rocket-landing-pad: 1 Assembling machine 3
+  - se-delivery-cannon-chest: 1 Assembling machine 3
+  - se-casting-machine: 1 Assembling machine 3
+  - se-delivery-cannon: 1 Assembling machine 3
+  - assembling-machine-3: 1 Assembling machine 3
+  - chemical-plant: 1 Assembling machine 3
+  - se-fuel-refinery: 1 Assembling machine 3
+  - oil-refinery: 1 Assembling machine 3
+  - se-thruster-suit: 1 Assembling machine 3
+  - textplate-large-concrete: 1 Assembling machine 3
