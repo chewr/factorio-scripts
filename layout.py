@@ -168,9 +168,9 @@ class Aisle:
         if self.note:
             data["note"] = self.note
         if self.forbidden:
-            data["forbidden"] = [item._id for item in self.forbidden]
+            data["forbidden"] = sorted([item._id for item in self.forbidden])
         if self.skip_recipes:
-            data["skip-recipes"] = [recipe._id for recipe in self.skip_recipes]
+            data["skip-recipes"] = sorted([recipe._id for recipe in self.skip_recipes])
         return data
 
     def get_space(self):
