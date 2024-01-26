@@ -488,6 +488,9 @@ class AddLane(Action):
     def __init__(self, item):
         self.item = item
 
+    def get_name(self):
+        return f"Add lane: {self.item._id}"
+
     def apply(self, node: Node) -> Node:
         current_aisle = node.current_aisle
         lanes = current_aisle.lanes.copy()
@@ -521,6 +524,9 @@ class AddMachine(Action):
     def __init__(self, recipe, facility):
         self.recipe = recipe
         self.facility = facility
+
+    def get_name(self):
+        return f"Add machine: {self.recipe._id}"
 
     def apply(self, node: Node) -> Node:
         # Update remainig recipes
@@ -584,6 +590,9 @@ class AddMachine(Action):
 
 
 class TerminateAisle(Action):
+    def get_name(self):
+        return "Terminate aisle"
+
     def apply(self, node: Node) -> Node:
         current_layout = node.layout
         aisles_updated = current_layout.aisles.copy()
@@ -605,6 +614,9 @@ class TerminateAisle(Action):
 class RemoveLanes(Action):
     def __init__(self, lanes):
         self.remove_lanes = lanes
+
+    def get_name(self):
+        return f"Remove Lanes: {sorted(self.remove_lanes)}"
 
     def apply(self, node):
         lanes = node.current_aisle.lanes.copy()
@@ -856,6 +868,9 @@ class HeuristicStrategy(BasicStrategy):
     def get_actions(self, node: Node) -> List[Action]:
         return sorted(
             super().get_actions(node),
-            key=lambda action: self._heuristic.score_action(node, action),
+            key=lambda action: (
+                self._heuristic.score_action(node, action),
+                action.get_name(),
+            ),
             reverse=True,
         )
