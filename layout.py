@@ -65,6 +65,8 @@ class Aisle:
     lanes: List[BaseItem]
     forbidden: Set[BaseItem]
     skip_recipes: Set[BaseRecipe]
+    enforce_recipes: Set[BaseRecipe]
+    _orig_enforce_recipes: List[BaseRecipe]
     lane_contents: Dict[BaseItem, float]
     machines: List[Tuple[BaseRecipe, FacilityItem]]
     max_allowed_lanes: int
@@ -79,7 +81,7 @@ class Aisle:
     def _get_input_rate(cls, item, input_type=EXPRESS_BELT):
         allow_fluids, solid_item_rate = {
             EXPRESS_BELT: (True, EXPRESS_BELT_LANE_RATE),
-            INSERTER_TRAIN: (False, 1.384),
+            INSERTER_TRAIN: (False, 0.462),
         }[input_type]
         if not allow_fluids and not isinstance(item, SolidItem):
             return 0
@@ -91,6 +93,8 @@ class Aisle:
             lanes=self.lanes,
             forbidden=self.forbidden,
             skip_recipes=self.skip_recipes,
+            enforce_recipes=self.enforce_recipes,
+            _orig_enforce_recipes=self._orig_enforce_recipes,
             lane_contents=self.lane_contents,
             machines=self.machines,
             max_allowed_lanes=self.max_allowed_lanes,
@@ -109,6 +113,8 @@ class Aisle:
             lanes=self.lanes,
             forbidden=self.forbidden,
             skip_recipes=self.skip_recipes,
+            enforce_recipes=self.enforce_recipes,
+            _orig_enforce_recipes=self._orig_enforce_recipes,
             max_allowed_lanes=self.max_allowed_lanes,
             input_type=self.input_type,
             max_banks=self.max_banks,
@@ -123,6 +129,8 @@ class Aisle:
             lanes=[],
             forbidden=set(),
             skip_recipes=set(),
+            enforce_recipes=set(),
+            _orig_enforce_recipes=list(),
             lane_contents={},
             machines=[],
             max_allowed_lanes=MAX_REACHABLE_LANES,
@@ -171,6 +179,10 @@ class Aisle:
             data["forbidden"] = sorted([item._id for item in self.forbidden])
         if self.skip_recipes:
             data["skip-recipes"] = sorted([recipe._id for recipe in self.skip_recipes])
+        if self._orig_enforce_recipes:
+            data["enforce-recipes"] = sorted(
+                [recipe._id for recipe in self._orig_enforce_recipes]
+            )
         return data
 
     def get_space(self):
@@ -222,6 +234,12 @@ class Aisle:
             forbidden={factory.items[itid] for itid in data.get("forbidden", set())},
             skip_recipes={
                 factory.recipes[rid] for rid in data.get("skip-recipes", set())
+            },
+            _orig_enforce_recipes=[
+                factory.recipes[rid] for rid in data.get("enforce-recipes", [])
+            ],
+            enforce_recipes={
+                factory.recipes[rid] for rid in data.get("enforce-recipes", set())
             },
         )
 
@@ -509,6 +527,8 @@ class AddLane(Action):
             note=current_aisle.note,
             forbidden=current_aisle.forbidden,
             skip_recipes=current_aisle.skip_recipes,
+            enforce_recipes=current_aisle.enforce_recipes,
+            _orig_enforce_recipes=current_aisle._orig_enforce_recipes,
         )
         return Node(
             layout=node.layout,
@@ -529,12 +549,20 @@ class AddMachine(Action):
         return f"Add machine: {self.recipe._id}"
 
     def apply(self, node: Node) -> Node:
+        enforce_recipes = node.current_aisle.enforce_recipes
+        enforce_recipes_cow = False
+
         # Update remainig recipes
         remaining_recipes = node.remaining_recipes.copy()
         recipe_details, requirements = remaining_recipes[self.recipe]
         requirements -= 1
         if requirements == 0:
             del remaining_recipes[self.recipe]
+            if self.recipe in enforce_recipes:
+                if not enforce_recipes_cow:
+                    enforce_recipes = enforce_recipes.copy()
+                    enforce_recipes_cow = True
+                enforce_recipes.remove(self.recipe)
         else:
             remaining_recipes[self.recipe] = (recipe_details, requirements)
 
@@ -578,6 +606,8 @@ class AddMachine(Action):
             note=node.current_aisle.note,
             forbidden=node.current_aisle.forbidden,
             skip_recipes=node.current_aisle.skip_recipes,
+            enforce_recipes=enforce_recipes,
+            _orig_enforce_recipes=node.current_aisle._orig_enforce_recipes,
         )
         return Node(
             layout=node.layout,
@@ -638,6 +668,8 @@ class RemoveLanes(Action):
             note=node.current_aisle.note,
             forbidden=node.current_aisle.forbidden,
             skip_recipes=node.current_aisle.skip_recipes,
+            enforce_recipes=node.current_aisle.enforce_recipes,
+            _orig_enforce_recipes=node.current_aisle._orig_enforce_recipes,
         )
         return Node(
             layout=node.layout,
@@ -671,6 +703,10 @@ class ActionHeuristic(ABC):
 
     @abstractmethod
     def _score_terminate(self, node: Node, action: TerminateAisle):
+        pass
+
+    @abstractmethod
+    def _score_remove(self, node: Node, aciton: RemoveLanes):
         pass
 
 
@@ -801,6 +837,151 @@ class BasicHeuristic(ActionHeuristic):
 # - Deprioritize recipes which take one or no bus inputs (lower priority than RemoveLane)
 # - Prioritize selection of recipes which reduce the total number of remaining recipes that depend on a given lane
 # - When selecting lanes, include aisle fullness as a priority with similar weight to significance (e.g. sum of significance and machines for instance)
+class NewHeuristic(BasicHeuristic):
+    def __init__(self, bus_items, recipes, partition):
+        super().__init__(bus_items, recipes, partition)
+        self._items_to_recipes = partition.items_to_recipes
+
+    def _score_add_lane(self, node: Node, action: AddLane):
+        if node.current_aisle.enforce_recipes:
+            return self._score_add_lane_by_enforced_recipes(node, action)
+        if node.current_aisle.input_type == EXPRESS_BELT:
+            return self._score_add_lane_by_consumption(node, action)
+        return self._score_add_lane_by_utility(node, action)
+
+    def _score_add_lane_by_enforced_recipes(self, node: Node, action: AddLane):
+        q = list(node.current_aisle.enforce_recipes)
+        available_items = {}
+        available_items.update(node.belt_contents)
+        available_items.update(node.current_aisle.lane_contents)
+        seen = set()
+        while q:
+            cur = q.pop()
+            if cur in seen:
+                continue
+            seen.add(cur)
+            for ingredient in cur.ingredients:
+                if ingredient == action.item:
+                    return 10
+                elif ingredient in available_items:
+                    continue
+                elif ingredient in self._bus_items:
+                    continue
+                q.append(self._items_to_recipes[ingredient])
+        return 0.1
+
+    def _score_add_lane_by_utility(self, node: Node, action: AddLane):
+        max_machines = node.current_aisle.max_banks * MACHINES_PER_BANK
+        current_machines = len(node.current_aisle.machines)
+
+        new_lane_contents = node.current_aisle.lane_contents.copy()
+        new_lane_contents[action.item] = new_lane_contents.get(
+            action.item, 0
+        ) + node.current_aisle.get_input_rate(action.item)
+
+        attainable_recipes = linearize_recipes(
+            node.remaining_recipes.keys(),
+            new_lane_contents.keys() | node.belt_contents.keys(),
+            reverse=True,
+        )
+
+        schedulable_recipes = []
+        for recipe in attainable_recipes:
+            details, _ = node.remaining_recipes[recipe]
+            schedulable = True
+            for ingredient, amount in recipe.ingredients.items():
+                if ingredient in new_lane_contents:
+                    if (
+                        details.recipe_rate_per_machine * amount
+                        > new_lane_contents[ingredient]
+                    ):
+                        schedulable = False
+                        break
+            if schedulable:
+                schedulable_recipes.append(recipe)
+
+        potential_machines = len(schedulable_recipes)
+
+        return min(1.0, (current_machines + potential_machines) / float(max_machines))
+
+    def _score_add_lane_by_consumption(self, node: Node, action: AddLane):
+        available_items = (
+            node.belt_contents.keys() | set(node.current_aisle.lanes) | {action.item}
+        )
+        attainable_recipes = linearize_recipes(
+            node.remaining_recipes.keys(), available_items
+        )
+
+        total_possible_consumption = 0.0
+        total_available_resources = 0.0
+        new_lanes = set(node.current_aisle.lanes) | {action.item}
+        for item in new_lanes:
+            input_rate = node.current_aisle.get_input_rate(
+                item
+            ) + node.current_aisle.lane_contents.get(item, 0)
+
+            total_available_resources += input_rate
+
+            for recipe in attainable_recipes:
+                if item not in recipe.ingredients:
+                    continue
+                details, machines_required = node.remaining_recipes[recipe]
+                total_possible_consumption += (
+                    details.recipe_rate_per_machine
+                    * machines_required
+                    * recipe.ingredients[item]
+                )
+
+        return total_possible_consumption / total_available_resources
+
+    def _score_add_machine(self, node: Node, action: AddMachine):
+        if node.current_aisle.enforce_recipes:
+            return self._score_add_machine_by_enforced_recipes(node, action)
+        if node.current_aisle.input_type == EXPRESS_BELT:
+            return self._score_add_machine_by_consumption(node, action)
+        return self._score_add_machine_by_utility(node, action)
+
+    def _score_add_machine_by_enforced_recipes(self, node: Node, action: AddMachine):
+        if action.recipe in node.current_aisle.enforce_recipes:
+            return 100
+        q = [action.recipe]
+        remaining_recipes = set(node.remaining_recipes.keys())
+        while q:
+            cur = q.pop()
+            if cur in node.current_aisle.enforce_recipes:
+                return 10
+            children = [
+                recipe
+                for recipe in remaining_recipes
+                if cur.outputs.keys() & recipe.ingredients.keys()
+            ]
+            remaining_recipes.difference_update(children)
+            q.extend(children)
+        return 0.1
+
+    def _score_add_machine_by_consumption(self, node: Node, action: AddMachine):
+        details, _ = node.remaining_recipes[action.recipe]
+
+        lane_item_consumption = [
+            amount * details.recipe_rate_per_machine
+            for ingredient, amount in action.recipe.ingredients.items()
+            if ingredient in node.current_aisle.lanes
+        ]
+        resources_consumed = sum(lane_item_consumption)
+        return resources_consumed * math.sqrt(len(lane_item_consumption))
+
+    def _score_add_machine_by_utility(self, node: Node, action: AddMachine):
+        significance = self._static_significance[action.recipe]
+        specificity = len(
+            action.recipe.ingredients.keys() & set(node.current_aisle.lanes)
+        )
+        return min(2, specificity) * significance + significance / 2
+
+    def _score_remove(self, node: Node, aciton: RemoveLanes):
+        return 0
+
+    def _score_terminate(self, node: Node, action: TerminateAisle):
+        return -1
 
 
 class Strategy(ABC):

@@ -226,7 +226,6 @@ base-outputs:
   tank: 0.001
   accumulator: 500
   se-space-elevator: 0.001
-  se-space-elevator-cable: 1
   aai-signal-receiver: 0.05
   se-delivery-cannon-weapon-capsule: 1
   mortar-cluster-bomb: 1
