@@ -1,36 +1,21 @@
 Blueprint
-x- Add power transmission
-x- Add roboports
 - Address inserter-bottlenecked assemblers
-x- Route the raw-material combinators through the master switch
-ip- Add a master switch for rocket requests as well
-- Fix output inserters for the recipes produced in machines other than Assembler Mk3s
-- Add shufflers to the left wing
-- Fix input inserters for the Stack Inserter and Filter Inserter machines
-- Toggle the main input switch to off by default
-x- There's a machine missing a recipe next to the green wire and red wire -> PDC would fit with a cheeky 4-belt setup if I can't find the actual recipe
-   - Pretty sure this is MDI ammo - PDC already has a cheeky setup
-x- Not all lamps are wired up on green
-- Fix inserter circuits for any hand-placed inserters
-  - heavy bearing
-  - heavy composite
-  - heavy assembly
+  - Script might be able to indicate which these are
+  - Draft 2 will demonstrate empirically
+
+Fix inserter circuits for any hand-placed inserters
+  x- heavy bearing
+  x- heavy composite
+  x- heavy assembly
   - ...
-- Add output inserters for machines on the left wing
-x- Remove the inline infinity drain
-x- Set drain combinator to off by default
-x- Add facility producing Lifesupport Equipment (Mk1) + combinators for it
-- Update quotas for the inserter warehouse chains
-  - Reduce buffer buildup (total size as well as unused ingredients
-  - Some ingredients are missing, e.g. accumulatros and solar panels
 - Some inserters seem to be unwired - a full fill + drain resulted in 13 leftover items (should have check to see what they were!)
-- Some hand-placed input inserters (mostly for non-assembler facilities) aren't wired or set properly
-  x- medpack 1 & 2
-
-
 
 Script
 - Assign combinators from left to right first then top to bottom
-- Add quotas for additional items (nixie tubes, space rails, etc) -> ensure each assembler's products have combinators
+- Add verification step that flags any recipes whose products do not have combinators
 - Turn all the signal-Y combinators on
 
+Finalization
+- Toggle the main input switch to off by default
+- Set drain combinator to off by default
+- Test rocket circuitry
