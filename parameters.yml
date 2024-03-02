@@ -3,6 +3,7 @@ config:
   modules:
     productivity: productivity-module-3
 bus-inputs:
+  se-iridium-plate: 2700
   accumulator: 2700
   advanced-circuit: 2700
   battery: 2700
@@ -180,7 +181,9 @@ base-outputs:
   se-spaceship-gate: 1
   se-lifesupport-facility: 0.01
   night-vision-equipment: 0.0001
-  # se-space-capsule: 0.1 This has too many bussed ingredients and I'm not sure how best to handle that yet
+  se-space-capsule: 1  # This had too many bussed ingredients for conventional belt layouts but shouldn't be aproblem with warehouse chains
+  se-space-probe-rocket: .1
+  satellite: .1
   pipe: 25
   car: 0.001
   fluid-wagon: 0.5

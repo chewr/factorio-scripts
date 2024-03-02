@@ -312,8 +312,10 @@ class Layout:
     def to_yaml(self, planner):
         input_rates = {}
         output_rates = {}
+        scheduled_recipes = set()
         for aisle in self.aisles:
             for recipe, _ in aisle.machines:
+                scheduled_recipes.add(recipe)
                 recipe_rate = planner.get_recipe_rate(recipe)
                 _, machines_required = planner.get_machine_requirements(recipe)
                 recipe_rate_per_machine = recipe_rate / machines_required
@@ -360,6 +362,11 @@ class Layout:
                 "recipe-rates": {
                     recipe._id: p for recipe, p in planner.recipe_rates.items()
                 },
+                "failures": [
+                    recipe._id
+                    for recipe in planner.recipe_rates.keys()
+                    if recipe not in scheduled_recipes
+                ],
             },
         }
         if self.staged:
@@ -399,7 +406,10 @@ class Node:
     current_aisle: Aisle
 
     def get_layout(self):
-        return self.layout
+        current_layout = self.layout
+        aisles_updated = current_layout.aisles.copy()
+        aisles_updated.append(self.current_aisle)
+        return Layout(aisles=aisles_updated, staged=current_layout.staged[1:])
 
     def has_remaining_recipes(self):
         return len(self.remaining_recipes) > 0
@@ -1018,6 +1028,8 @@ class LayoutPlanner:
 
     @classmethod
     def _plan_layout_recursive(cls, node: Node, strategy: Strategy):
+        if node.is_goal_state():
+            return node
         for action in strategy.get_actions(node):
             nodes_looked_at_meter.record(1)
             child = action.apply(node)
