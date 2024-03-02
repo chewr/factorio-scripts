@@ -1,8 +1,8 @@
-from sxp import Factory
 import random
 import sys
 
-from blueprint_utils import load_bp, save_bp, step, get_coords, get_ent_at_pos
+from blueprint_utils import get_coords, get_ent_at_pos, load_bp, save_bp, step
+from sxp import Factory
 
 
 def get_inserters(bp_data):

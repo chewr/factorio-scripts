@@ -1,6 +1,6 @@
-from base64 import b64decode, b64encode
-import zlib
 import json
+import zlib
+from base64 import b64decode, b64encode
 
 
 def load_bp(bp_file):
