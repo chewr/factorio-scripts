@@ -247,6 +247,9 @@ class Aisle:
         return self.max_banks * MACHINES_PER_BANK
 
     def get_actions(self, bus_items, belt_contents, recipe_requirements):
+        if not recipe_requirements:
+            return [TerminateAisle()]
+
         if len(self.machines) >= self.max_machines():
             return [TerminateAisle()]
 
@@ -288,7 +291,18 @@ class Aisle:
             if lanes_to_remove:
                 return [RemoveLanes(lanes_to_remove)]
             return [TerminateAisle()]
-        return machine_actions + lane_actions
+
+        available_actions = machine_actions + lane_actions
+        if available_actions:
+            return available_actions
+
+        if all(
+            [
+                len(r.ingredients.keys() & bus_items) > self.max_allowed_lanes
+                for r in recipe_requirements
+            ]
+        ):
+            return [ExpandAisle()]
 
 
 @dataclass(frozen=True)
@@ -651,6 +665,34 @@ class TerminateAisle(Action):
         )
 
 
+class ExpandAisle(Action):
+    def get_name(self):
+        return "Expand aisle"
+
+    def apply(self, node):
+        current_aisle = Aisle(
+            lanes=node.current_aisle.lanes,
+            lane_contents=node.current_aisle.lane_contents,
+            machines=node.current_aisle.machines,
+            max_allowed_lanes=node.current_aisle.max_allowed_lanes + 1,
+            input_type=node.current_aisle.input_type,
+            max_banks=node.current_aisle.max_banks,
+            note=node.current_aisle.note,
+            forbidden=node.current_aisle.forbidden,
+            skip_recipes=node.current_aisle.skip_recipes,
+            enforce_recipes=node.current_aisle.enforce_recipes,
+            _orig_enforce_recipes=node.current_aisle._orig_enforce_recipes,
+        )
+        return Node(
+            layout=node.layout,
+            bus_items=node.bus_items,
+            belt_contents=node.belt_contents,
+            current_production=node.current_production,
+            remaining_recipes=node.remaining_recipes,
+            current_aisle=current_aisle,
+        )
+
+
 class RemoveLanes(Action):
     def __init__(self, lanes):
         self.remove_lanes = lanes
@@ -701,6 +743,8 @@ class ActionHeuristic(ABC):
             return self._score_terminate(node, action)
         elif isinstance(action, RemoveLanes):
             return self._score_remove(node, action)
+        elif isinstance(action, ExpandAisle):
+            return self._score_expand(node, action)
         raise TypeError(f"Unrecognized action type: {type(action)}")
 
     @abstractmethod
@@ -713,6 +757,10 @@ class ActionHeuristic(ABC):
 
     @abstractmethod
     def _score_terminate(self, node: Node, action: TerminateAisle):
+        pass
+
+    @abstractmethod
+    def _score_expand(self, node: Node, action: TerminateAisle):
         pass
 
     @abstractmethod
@@ -832,6 +880,9 @@ class BasicHeuristic(ActionHeuristic):
         significance = self._static_significance[action.recipe]
         uniqueness = len(action.recipe.ingredients.keys() & self._bus_items)
         return (significance, uniqueness)
+
+    def _score_expand(self, *_):
+        return (0,)
 
     def _score_terminate(self, *_):
         return (0,)
@@ -990,6 +1041,8 @@ class NewHeuristic(BasicHeuristic):
     def _score_remove(self, node: Node, aciton: RemoveLanes):
         return 0
 
+    def _score_expand(self, node: Node, action: ExpandAisle):
+        return -1
     def _score_terminate(self, node: Node, action: TerminateAisle):
         return -1
 
@@ -1002,14 +1055,6 @@ class Strategy(ABC):
 
 class LayoutPlanner:
     def __init__(self, bus_items, recipes, production_planner, initial_state=None):
-        overcomplex_recipes = [
-            recipe._id
-            for recipe in recipes
-            if len(recipe.ingredients.keys() & bus_items) > MAX_REACHABLE_LANES
-        ]
-        assert (
-            len(overcomplex_recipes) == 0
-        ), f"All recipes must user no more than {MAX_REACHABLE_LANES} ingredients. The following do not: {overcomplex_recipes}"
 
         if not initial_state:
             initial_state = Node.initial(bus_items, recipes, production_planner)

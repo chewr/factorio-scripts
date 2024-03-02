@@ -2,9 +2,9 @@ aisles:
 - count: 50
   lane-contents:
     heavy-oil: 296.7715081736095
-    iron-plate: 7.6371249312981275
+    iron-plate: 7.600672952906087
     plastic-bar: 22.375
-    se-beryllium-plate: 12.19840345604808
+    se-beryllium-plate: 12.082459813933642
     se-canister: 22.491666666666667
     se-water-ice: 22.441347358822014
   lanes:
@@ -140,9 +140,9 @@ aisles:
   - heavy-oil
   lane-contents:
     copper-plate: 10.631700757575757
-    electric-motor: 20.795333333333332
-    iron-plate: 17.703045454545457
-    steel-plate: 10.783815656565654
+    electric-motor: 20.78808685570118
+    iron-plate: 17.51463703610949
+    steel-plate: 10.762076223669201
     stone: 21.454545454545453
     stone-brick: 19.4985
   lanes:
@@ -294,7 +294,7 @@ aisles:
     electronic-circuit: 8.635233333333337
     glass: 16.160833333333336
     solid-fuel: 22.4825
-    steel-plate: 7.715633333333329
+    steel-plate: 7.715633333333333
   lanes:
   - advanced-circuit
   - battery
@@ -494,7 +494,7 @@ aisles:
   - small-lamp: 1 Assembling machine 3
   - programmable-speaker: 1 Assembling machine 3
   - power-switch: 1 Assembling machine 3
-- count: 49
+- count: 50
   forbidden:
   - heavy-oil
   - iron-plate
@@ -504,7 +504,7 @@ aisles:
     electronic-circuit: 19.343333333333334
     fast-inserter: 22.28333333333333
     flying-robot-frame: 21.5
-    se-cryonite-rod: 21.010778236914604
+    se-cryonite-rod: 20.991647535965754
   lanes:
   - advanced-circuit
   - electronic-circuit
@@ -512,6 +512,8 @@ aisles:
   - flying-robot-frame
   - se-cryonite-rod
   machines:
+  - machine: assembling-machine-3
+    recipe: se-aeroframe-scaffold
   - machine: assembling-machine-3
     recipe: se-aeroframe-scaffold
   - machine: assembling-machine-3
@@ -635,7 +637,7 @@ aisles:
   - textplate-small-stone
   - textplate-small-uranium
   summary:
-  - se-aeroframe-scaffold: 24 Assembling machine 3
+  - se-aeroframe-scaffold: 25 Assembling machine 3
   - stack-inserter: 1 Assembling machine 3
   - filter-inserter: 1 Assembling machine 3
   - construction-robot: 1 Assembling machine 3
@@ -1071,42 +1073,49 @@ aisles:
   - textplate-large-concrete: 1 Assembling machine 3
   - se-heavy-assembly: 1 Assembling machine 3
   - textplate-small-concrete: 1 Assembling machine 3
-- count: 41
+- count: 50
   lane-contents:
-    advanced-circuit: 21.825
+    accumulator: 21.650000000000002
+    advanced-circuit: 21.71992723377021
     battery: 22.035000000000004
+    coal: 22.483316666666667
     concrete: 18.529999999999998
     copper-plate: 21.39666666666667
-    electric-engine-unit: 21.889666666666667
+    electric-engine-unit: 21.872983333333334
     electric-motor: 22.258333333333333
     electronic-circuit: 21.966666666666665
     explosives: 20.833333333333336
-    glass: 22.238333333333333
+    fast-inserter: 22.49275352236785
+    glass: 21.2383
     iron-plate: 22.25
-    low-density-structure: 22.3325
+    low-density-structure: 20.546652632384447
     processing-unit: 21.612000000000005
-    radar: 22.449833333333338
+    radar: 22.448166666666673
     refined-concrete: 22.483333333333334
-    rocket-control-unit: 22.316666666666666
-    rocket-fuel: 22.30459770114943
-    se-beryllium-plate: 22.416666666666668
-    se-heat-shielding: 21.774666666666665
+    rocket-control-unit: 20.630852632384446
+    rocket-fuel: 20.491466388018118
+    se-beryllium-plate: 22.378405264768904
+    se-heat-shielding: 20.088835965717777
     se-heavy-girder: 22.403833333333335
     se-holmium-cable: 21.744666666666667
-    se-holmium-solenoid: 22.32
-    se-iridium-plate: 22.333333333333332
-    steel-plate: 18.455000000000002
+    se-holmium-solenoid: 22.31368686868687
+    se-iridium-plate: 22.27020202020202
+    solar-panel: 21.650000000000002
+    steel-plate: 18.433260567103545
     stone-brick: 22.175
     uranium-235: 20.80459770114943
   lanes:
+  - accumulator
   - advanced-circuit
   - battery
+  - coal
   - concrete
   - copper-plate
   - electric-engine-unit
   - electric-motor
   - electronic-circuit
   - explosives
+  - fast-inserter
   - glass
   - iron-plate
   - low-density-structure
@@ -1121,133 +1130,161 @@ aisles:
   - se-holmium-cable
   - se-holmium-solenoid
   - se-iridium-plate
+  - solar-panel
   - steel-plate
   - stone-brick
   - uranium-235
   machines:
   - machine: assembling-machine-3
-    recipe: atomic-bomb
+    recipe: se-cargo-rocket-fuel-tank
   - machine: assembling-machine-3
-    recipe: assembling-machine-3
+    recipe: se-energy-beam-defence
+  - machine: assembling-machine-3
+    recipe: se-space-probe-rocket-silo
   - machine: assembling-machine-3
     recipe: se-rocket-launch-pad
   - machine: assembling-machine-3
-    recipe: se-casting-machine
+    recipe: se-recycling-facility
+  - machine: assembling-machine-3
+    recipe: se-meteor-defence
   - machine: assembling-machine-3
     recipe: se-delivery-cannon-weapon-capsule
   - machine: assembling-machine-3
-    recipe: se-rocket-landing-pad
+    recipe: se-delivery-cannon-weapon
   - machine: assembling-machine-3
-    recipe: se-electric-boiler
+    recipe: centrifuge
+  - machine: assembling-machine-3
+    recipe: se-supercharger
+  - machine: assembling-machine-3
+    recipe: se-spaceship-ion-booster-tank
+  - machine: assembling-machine-3
+    recipe: se-space-elevator
   - machine: assembling-machine-3
     recipe: se-pylon-construction
   - machine: assembling-machine-3
-    recipe: se-pulveriser
+    recipe: se-fuel-refinery
+  - machine: assembling-machine-3
+    recipe: se-casting-machine
+  - machine: assembling-machine-3
+    recipe: oil-refinery
   - machine: assembling-machine-3
     recipe: nuclear-reactor
   - machine: assembling-machine-3
     recipe: industrial-furnace
   - machine: assembling-machine-3
-    recipe: se-spaceship-ion-booster-tank
-  - machine: assembling-machine-3
-    recipe: oil-refinery
-  - machine: assembling-machine-3
-    recipe: se-delivery-cannon-chest
-  - machine: assembling-machine-3
-    recipe: centrifuge
-  - machine: assembling-machine-3
     recipe: chemical-plant
   - machine: assembling-machine-3
-    recipe: se-pylon-substation
+    recipe: atomic-bomb
   - machine: assembling-machine-3
-    recipe: se-meteor-defence
-  - machine: assembling-machine-3
-    recipe: se-fuel-refinery
+    recipe: assembling-machine-3
   - machine: assembling-machine-3
     recipe: aai-signal-sender
   - machine: assembling-machine-3
-    recipe: se-delivery-cannon-weapon
-  - machine: assembling-machine-3
-    recipe: se-recycling-facility
-  - machine: assembling-machine-3
     recipe: aai-signal-receiver
   - machine: assembling-machine-3
-    recipe: se-supercharger
+    recipe: se-spaceship-clamp
   - machine: assembling-machine-3
-    recipe: se-space-elevator
+    recipe: se-rocket-landing-pad
   - machine: assembling-machine-3
-    recipe: battery-mk2-equipment
+    recipe: se-pylon-substation
   - machine: assembling-machine-3
-    recipe: textplate-large-stone
+    recipe: se-pulveriser
   - machine: assembling-machine-3
-    recipe: textplate-large-copper
+    recipe: se-electric-boiler
+  - machine: assembling-machine-3
+    recipe: se-delivery-cannon-chest
   - machine: assembling-machine-3
     recipe: spidertron-remote
   - machine: assembling-machine-3
-    recipe: se-energy-beam-defence
+    recipe: se-rtg-equipment
+  - machine: centrifuge
+    recipe: nuclear-fuel
+  - machine: centrifuge
+    recipe: nuclear-fuel
+  - machine: centrifuge
+    recipe: nuclear-fuel
+  - machine: centrifuge
+    recipe: nuclear-fuel
+  - machine: centrifuge
+    recipe: nuclear-fuel
+  - machine: assembling-machine-3
+    recipe: battery-mk2-equipment
+  - machine: assembling-machine-3
+    recipe: artillery-targeting-remote
+  - machine: assembling-machine-3
+    recipe: se-cargo-rocket-cargo-pod
+  - machine: assembling-machine-3
+    recipe: se-cargo-rocket-section-beryllium
+  - machine: assembling-machine-3
+    recipe: se-cargo-rocket-section-beryllium
+  - machine: assembling-machine-3
+    recipe: se-space-probe-rocket
+  - machine: se-lifesupport-facility
+    recipe: se-lifesupport-equipment-1
+  - machine: assembling-machine-3
+    recipe: se-thruster-suit
+  - machine: assembling-machine-3
+    recipe: se-space-capsule
+  - machine: assembling-machine-3
+    recipe: satellite
   - machine: assembling-machine-3
     recipe: textplate-small-stone
   - machine: assembling-machine-3
     recipe: textplate-small-copper
-  - machine: centrifuge
-    recipe: nuclear-fuel
-  - machine: centrifuge
-    recipe: nuclear-fuel
-  - machine: centrifuge
-    recipe: nuclear-fuel
-  - machine: centrifuge
-    recipe: nuclear-fuel
-  - machine: centrifuge
-    recipe: nuclear-fuel
   - machine: assembling-machine-3
-    recipe: se-spaceship-clamp
+    recipe: textplate-large-stone
   - machine: assembling-machine-3
-    recipe: se-space-probe-rocket-silo
-  - machine: assembling-machine-3
-    recipe: se-rtg-equipment
-  - machine: assembling-machine-3
-    recipe: artillery-targeting-remote
-  max-lanes: 25
+    recipe: textplate-large-copper
+  max-lanes: 45
   note: warehouse-chain
   summary:
-  - atomic-bomb: 1 Assembling machine 3
-  - assembling-machine-3: 1 Assembling machine 3
+  - se-cargo-rocket-fuel-tank: 1 Assembling machine 3
+  - se-energy-beam-defence: 1 Assembling machine 3
+  - se-space-probe-rocket-silo: 1 Assembling machine 3
   - se-rocket-launch-pad: 1 Assembling machine 3
-  - se-casting-machine: 1 Assembling machine 3
+  - se-recycling-facility: 1 Assembling machine 3
+  - se-meteor-defence: 1 Assembling machine 3
   - se-delivery-cannon-weapon-capsule: 1 Assembling machine 3
-  - se-rocket-landing-pad: 1 Assembling machine 3
-  - se-electric-boiler: 1 Assembling machine 3
+  - se-delivery-cannon-weapon: 1 Assembling machine 3
+  - centrifuge: 1 Assembling machine 3
+  - se-supercharger: 1 Assembling machine 3
+  - se-spaceship-ion-booster-tank: 1 Assembling machine 3
+  - se-space-elevator: 1 Assembling machine 3
   - se-pylon-construction: 1 Assembling machine 3
-  - se-pulveriser: 1 Assembling machine 3
+  - se-fuel-refinery: 1 Assembling machine 3
+  - se-casting-machine: 1 Assembling machine 3
+  - oil-refinery: 1 Assembling machine 3
   - nuclear-reactor: 1 Assembling machine 3
   - industrial-furnace: 1 Assembling machine 3
-  - se-spaceship-ion-booster-tank: 1 Assembling machine 3
-  - oil-refinery: 1 Assembling machine 3
-  - se-delivery-cannon-chest: 1 Assembling machine 3
-  - centrifuge: 1 Assembling machine 3
   - chemical-plant: 1 Assembling machine 3
-  - se-pylon-substation: 1 Assembling machine 3
-  - se-meteor-defence: 1 Assembling machine 3
-  - se-fuel-refinery: 1 Assembling machine 3
+  - atomic-bomb: 1 Assembling machine 3
+  - assembling-machine-3: 1 Assembling machine 3
   - aai-signal-sender: 1 Assembling machine 3
-  - se-delivery-cannon-weapon: 1 Assembling machine 3
-  - se-recycling-facility: 1 Assembling machine 3
   - aai-signal-receiver: 1 Assembling machine 3
-  - se-supercharger: 1 Assembling machine 3
-  - se-space-elevator: 1 Assembling machine 3
-  - battery-mk2-equipment: 1 Assembling machine 3
-  - textplate-large-stone: 1 Assembling machine 3
-  - textplate-large-copper: 1 Assembling machine 3
+  - se-spaceship-clamp: 1 Assembling machine 3
+  - se-rocket-landing-pad: 1 Assembling machine 3
+  - se-pylon-substation: 1 Assembling machine 3
+  - se-pulveriser: 1 Assembling machine 3
+  - se-electric-boiler: 1 Assembling machine 3
+  - se-delivery-cannon-chest: 1 Assembling machine 3
   - spidertron-remote: 1 Assembling machine 3
-  - se-energy-beam-defence: 1 Assembling machine 3
+  - se-rtg-equipment: 1 Assembling machine 3
+  - nuclear-fuel: 5 Centrifuge
+  - battery-mk2-equipment: 1 Assembling machine 3
+  - artillery-targeting-remote: 1 Assembling machine 3
+  - se-cargo-rocket-cargo-pod: 1 Assembling machine 3
+  - se-cargo-rocket-section-beryllium: 2 Assembling machine 3
+  - se-space-probe-rocket: 1 Assembling machine 3
+  - se-lifesupport-equipment-1: 1 Lifesupport facility
+  - se-thruster-suit: 1 Assembling machine 3
+  - se-space-capsule: 1 Assembling machine 3
+  - satellite: 1 Assembling machine 3
   - textplate-small-stone: 1 Assembling machine 3
   - textplate-small-copper: 1 Assembling machine 3
-  - nuclear-fuel: 5 Centrifuge
-  - se-spaceship-clamp: 1 Assembling machine 3
-  - se-space-probe-rocket-silo: 1 Assembling machine 3
-  - se-rtg-equipment: 1 Assembling machine 3
-  - artillery-targeting-remote: 1 Assembling machine 3
+  - textplate-large-stone: 1 Assembling machine 3
+  - textplate-large-copper: 1 Assembling machine 3
 belt-contents:
+  failures: []
   input:
     aai-storehouse: 0.028333333333333335
     aai-strongbox: 0.056666666666666664
@@ -1274,10 +1311,10 @@ belt-contents:
     grenade: 0.44166666666666665
     heavy-armor: 1.6666666666666667e-06
     inserter: 0.08333333333333333
-    iron-chest: 0.05
+    iron-chest: 0.06449295526430512
     iron-gear-wheel: 4.088821472298746
-    iron-stick: 8.334798271975954
-    jetpack-1: 6.666666666666667e-05
+    iron-stick: 8.392770093033176
+    jetpack-1: 6.833333333333333e-05
     jetpack-2: 3.3333333333333335e-05
     laser-turret: 0.00025
     light-armor: 1.6666666666666667e-06
@@ -1288,18 +1325,22 @@ belt-contents:
     personal-roboport-equipment: 8.333333333333334e-05
     petroleum-gas: 1.8413978494623655
     piercing-rounds-magazine: 0.33
-    pipe: 3.13435
+    pipe: 3.1655262885976385
     power-armor: 1.6666666666666667e-06
-    pump: 0.00016666666666666666
+    pump: 0.003789905482742948
     rocket: 0.16666666666666666
     se-adaptive-armour-equipment-1: 1.6666666666666667e-05
     se-adaptive-armour-equipment-2: 1.6666666666666667e-05
     se-adaptive-armour-equipment-3: 1.6666666666666667e-05
     se-aeroframe-bulkhead: 1.25
-    se-aeroframe-pole: 6.799053719008266
-    se-aeroframe-scaffold: 1.9657727272727277
+    se-aeroframe-pole: 6.875576522803799
+    se-aeroframe-scaffold: 1.991025252525253
+    se-cargo-rocket-cargo-pod: 0.004782675237220692
+    se-cargo-rocket-fuel-tank: 0.004782675237220692
+    se-cargo-rocket-section: 0.012626262626262628
     se-heavy-bearing: 0.10267676767676767
     se-heavy-composite: 0.025252525252525252
+    se-lifesupport-equipment-1: 1.6666666666666667e-06
     se-medpack: 0.008333333333333333
     se-pylon: 0.025
     se-spaceship-wall: 0.016666666666666666
@@ -1312,14 +1353,14 @@ belt-contents:
     steel-furnace: 0.05
     stone-furnace: 0.05
     stone-wall: 0.35
-    storage-tank: 0.03333333333333333
+    storage-tank: 0.03695657214940961
     sulfur: 0.08333333333333333
     uranium-fuel-cell: 6.666666666666667e-05
     water: 5.86526411779844
   output:
     aai-signal-receiver: 0.0008333333333333334
     aai-signal-sender: 0.0016666666666666668
-    aai-storehouse: 0.03666666666666667
+    aai-storehouse: 0.03666666666666666
     aai-storehouse-active-provider: 0.0016666666666666668
     aai-storehouse-buffer: 0.0016666666666666668
     aai-storehouse-passive-provider: 0.008333333333333333
@@ -1398,9 +1439,9 @@ belt-contents:
     heavy-oil-barrel: 0.16666666666666666
     industrial-furnace: 0.016666666666666666
     inserter: 0.08333333333333333
-    iron-chest: 0.18333333333333332
-    iron-gear-wheel: 4.088821472298745
-    iron-stick: 8.334798271975957
+    iron-chest: 0.19782628859763846
+    iron-gear-wheel: 4.088821472298744
+    iron-stick: 8.392770093033176
     ironclad: 1.6666666666666667e-05
     jetpack-1: 6.833333333333333e-05
     jetpack-2: 3.3333333333333335e-05
@@ -1433,7 +1474,7 @@ belt-contents:
     personal-roboport-mk2-equipment: 1.6666666666666667e-05
     petroleum-gas: 1.8413978494623655
     piercing-rounds-magazine: 0.33
-    pipe: 3.5677
+    pipe: 3.582192955264305
     pipe-to-ground: 0.13333333333333333
     poison-capsule: 0.03333333333333333
     power-armor: 1.6666666666666667e-06
@@ -1441,7 +1482,7 @@ belt-contents:
     power-switch: 0.00016666666666666666
     productivity-module: 0.13333333333333333
     programmable-speaker: 0.00016666666666666666
-    pump: 0.33349999999999996
+    pump: 0.33712323881607625
     pumpjack: 0.0016666666666666668
     rail: 0.8333333333333334
     rail-chain-signal: 0.16666666666666666
@@ -1452,14 +1493,18 @@ belt-contents:
     roboport: 0.016666666666666666
     rocket: 0.16666666666666666
     rocket-launcher: 0.00016666666666666666
+    satellite: 0.0016666666666666668
     se-adaptive-armour-equipment-1: 1.6666666666666667e-05
     se-adaptive-armour-equipment-2: 1.6666666666666667e-05
     se-adaptive-armour-equipment-3: 1.6666666666666667e-05
     se-adaptive-armour-equipment-4: 1.6666666666666667e-05
     se-addon-power-pole: 0.16666666666666666
     se-aeroframe-bulkhead: 1.25
-    se-aeroframe-pole: 6.7990537190082625
-    se-aeroframe-scaffold: 1.965772727272727
+    se-aeroframe-pole: 6.875576522803797
+    se-aeroframe-scaffold: 1.9910252525252528
+    se-cargo-rocket-cargo-pod: 0.004782675237220692
+    se-cargo-rocket-fuel-tank: 0.004782675237220692
+    se-cargo-rocket-section: 0.012626262626262628
     se-casting-machine: 0.06666666666666667
     se-condenser-turbine: 0.004166666666666667
     se-core-miner: 0.0008333333333333334
@@ -1474,6 +1519,7 @@ belt-contents:
     se-heavy-assembly: 0.016666666666666666
     se-heavy-bearing: 0.10267676767676769
     se-heavy-composite: 0.025252525252525252
+    se-lifesupport-equipment-1: 0.0016683333333333335
     se-lifesupport-facility: 0.00016666666666666666
     se-medpack: 0.008333333333333333
     se-medpack-2: 0.008333333333333333
@@ -1490,7 +1536,9 @@ belt-contents:
     se-rocket-launch-pad: 0.0008333333333333334
     se-rtg-equipment: 1.6666666666666667e-05
     se-space-assembling-machine: 0.08333333333333333
+    se-space-capsule: 0.016666666666666666
     se-space-elevator: 1.6666666666666667e-05
+    se-space-probe-rocket: 0.001666666666666667
     se-space-probe-rocket-silo: 1.6666666666666667e-06
     se-spaceship-clamp: 0.00016666666666666666
     se-spaceship-floor: 0.26666666666666666
@@ -1498,6 +1546,7 @@ belt-contents:
     se-spaceship-ion-booster-tank: 0.008333333333333333
     se-spaceship-wall: 0.08333333333333333
     se-supercharger: 0.0008333333333333334
+    se-thruster-suit: 1.6666666666666667e-06
     slowdown-capsule: 0.08333333333333333
     small-iron-electric-pole: 0.16666666666666666
     small-lamp: 0.08333333333333333
@@ -1507,12 +1556,12 @@ belt-contents:
     stack-filter-inserter: 0.016666666666666666
     stack-inserter: 0.05
     steam-turbine: 0.010416666666666668
-    steel-chest: 0.6666666666666667
+    steel-chest: 0.6666666666666666
     steel-furnace: 0.05
     steel-wall: 0.3333333333333333
     stone-furnace: 0.05
     stone-wall: 0.35
-    storage-tank: 0.049999999999999996
+    storage-tank: 0.05362323881607628
     submachine-gun: 1.6666666666666667e-05
     substation: 0.08333333333333333
     sulfur: 0.08333333333333333
@@ -1675,6 +1724,7 @@ belt-contents:
     roboport: 1.0
     rocket: 1.0
     rocket-launcher: 1.0
+    satellite: 1.0
     se-adaptive-armour-equipment-1: 1.0
     se-adaptive-armour-equipment-2: 1.0
     se-adaptive-armour-equipment-3: 1.0
@@ -1683,6 +1733,9 @@ belt-contents:
     se-aeroframe-bulkhead: 1.32
     se-aeroframe-pole: 1.32
     se-aeroframe-scaffold: 1.32
+    se-cargo-rocket-cargo-pod: 1.32
+    se-cargo-rocket-fuel-tank: 1.32
+    se-cargo-rocket-section-beryllium: 1.32
     se-casting-machine: 1.0
     se-condenser-turbine: 1.0
     se-core-miner: 1.0
@@ -1715,7 +1768,9 @@ belt-contents:
     se-rocket-launch-pad: 1.0
     se-rtg-equipment: 1.0
     se-space-assembling-machine: 1.0
+    se-space-capsule: 1.0
     se-space-elevator: 1.0
+    se-space-probe-rocket: 1.32
     se-space-probe-rocket-silo: 1.0
     se-spaceship-clamp: 1.0
     se-spaceship-floor: 1.0
@@ -1767,7 +1822,7 @@ belt-contents:
   recipe-rates:
     aai-signal-receiver: 0.0008333333333333334
     aai-signal-sender: 0.0016666666666666668
-    aai-storehouse: 0.03666666666666667
+    aai-storehouse: 0.03666666666666666
     aai-storehouse-active-provider: 0.0016666666666666668
     aai-storehouse-buffer: 0.0016666666666666668
     aai-storehouse-passive-provider: 0.008333333333333333
@@ -1847,9 +1902,9 @@ belt-contents:
     heavy-oil-cracking: 0.05987896232642968
     industrial-furnace: 0.016666666666666666
     inserter: 0.08333333333333333
-    iron-chest: 0.18333333333333332
-    iron-gear-wheel: 3.0975920244687463
-    iron-stick: 3.1571205575666506
+    iron-chest: 0.19782628859763846
+    iron-gear-wheel: 3.0975920244687454
+    iron-stick: 3.179079580694385
     ironclad: 1.6666666666666667e-05
     jetpack-1: 6.833333333333333e-05
     jetpack-2: 3.3333333333333335e-05
@@ -1881,7 +1936,7 @@ belt-contents:
     personal-roboport-equipment: 8.333333333333334e-05
     personal-roboport-mk2-equipment: 1.6666666666666667e-05
     piercing-rounds-magazine: 0.33
-    pipe: 3.5677
+    pipe: 3.582192955264305
     pipe-to-ground: 0.06666666666666667
     poison-capsule: 0.03333333333333333
     power-armor: 1.6666666666666667e-06
@@ -1889,7 +1944,7 @@ belt-contents:
     power-switch: 0.00016666666666666666
     productivity-module: 0.13333333333333333
     programmable-speaker: 0.00016666666666666666
-    pump: 0.33349999999999996
+    pump: 0.33712323881607625
     pumpjack: 0.0016666666666666668
     rail: 0.4166666666666667
     rail-chain-signal: 0.16666666666666666
@@ -1900,14 +1955,18 @@ belt-contents:
     roboport: 0.016666666666666666
     rocket: 0.16666666666666666
     rocket-launcher: 0.00016666666666666666
+    satellite: 0.0016666666666666668
     se-adaptive-armour-equipment-1: 1.6666666666666667e-05
     se-adaptive-armour-equipment-2: 1.6666666666666667e-05
     se-adaptive-armour-equipment-3: 1.6666666666666667e-05
     se-adaptive-armour-equipment-4: 1.6666666666666667e-05
     se-addon-power-pole: 0.16666666666666666
     se-aeroframe-bulkhead: 0.9469696969696969
-    se-aeroframe-pole: 5.150798271975957
-    se-aeroframe-scaffold: 1.4892217630853994
+    se-aeroframe-pole: 5.208770093033178
+    se-aeroframe-scaffold: 1.5083524640342822
+    se-cargo-rocket-cargo-pod: 0.0036232388160762816
+    se-cargo-rocket-fuel-tank: 0.0036232388160762816
+    se-cargo-rocket-section-beryllium: 0.004782675237220692
     se-casting-machine: 0.06666666666666667
     se-condenser-turbine: 0.004166666666666667
     se-core-miner: 0.0008333333333333334
@@ -1940,7 +1999,9 @@ belt-contents:
     se-rocket-launch-pad: 0.0008333333333333334
     se-rtg-equipment: 1.6666666666666667e-05
     se-space-assembling-machine: 0.08333333333333333
+    se-space-capsule: 0.016666666666666666
     se-space-elevator: 1.6666666666666667e-05
+    se-space-probe-rocket: 0.0012626262626262627
     se-space-probe-rocket-silo: 1.6666666666666667e-06
     se-spaceship-clamp: 0.00016666666666666666
     se-spaceship-floor: 0.26666666666666666
@@ -1958,12 +2019,12 @@ belt-contents:
     stack-filter-inserter: 0.016666666666666666
     stack-inserter: 0.05
     steam-turbine: 0.010416666666666668
-    steel-chest: 0.6666666666666667
+    steel-chest: 0.6666666666666666
     steel-furnace: 0.05
     steel-wall: 0.3333333333333333
     stone-furnace: 0.05
     stone-wall: 0.35
-    storage-tank: 0.049999999999999996
+    storage-tank: 0.05362323881607628
     submachine-gun: 1.6666666666666667e-05
     substation: 0.08333333333333333
     sulfur: 0.033602150537634407
@@ -1990,5 +2051,5 @@ belt-contents:
     uranium-fuel-cell: 0.025257575757575753
     uranium-rounds-magazine: 0.25
   totals:
-    inputs: 42.10149982691936
-    outputs: 59.51917316025256
+    inputs: 42.33635764495278
+    outputs: 59.759014311619325
